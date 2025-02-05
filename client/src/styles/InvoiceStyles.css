@@ -1,103 +1,62 @@
-#invoice-POS {
-  box-shadow: 0 0 1in -0.25in rgba(0, 0, 0, 0.5);
-  padding: 4mm;
-  margin: 0 auto;
-  width: 76mm;
+.receipt-container {
+  width: 320px;
+  margin: auto;
+  padding: 15px;
   background: #fff;
+  text-align: center;
+  font-family: "Arial", sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
-::selection {
-  background: #f31544;
-  color: #fff;
-}
-::moz-selection {
-  background: #f31544;
-  color: #fff;
-}
-h1 {
-  font-size: 1.5em;
-  color: #222;
-}
-h2 {
-  font-size: 0.9em;
-}
-h3 {
-  font-size: 1.2em;
-  font-weight: 300;
-  line-height: 2em;
-}
-p {
-  font-size: 0.7em;
-  color: #666;
-  line-height: 1.2em;
+.receipt-header {
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #1890ff;
+  color: white;
+  border-radius: 5px;
+  text-align: center;
 }
 
-#top,
-#mid,
-#bot {
-  /* Targets all id with 'col-' */
-  border-bottom: 1px solid #eee;
+.receipt-info {
+  font-size: 14px;
+  color: #444;
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
 }
 
-#top {
-  min-height: 100px;
-}
-
-#bot {
-  min-height: 50px;
-}
-
-#top .logo {
-  /* //float: left; */
-  height: 60px;
-  width: 60px;
-  border-radius: 20%;
-  background: url(https://yt3.ggpht.com/ytc/AKedOLRB0XGxEABopk8qJ2-CcnA0UoVyC7TarDi5PJwGIQ=s176-c-k-c0x00ffffff-no-rj-mo)
-    no-repeat;
-  background-size: 50px 50px;
-}
-.clientlogo {
-  float: left;
-  height: 60px;
-  width: 60px;
-  background: url(http://michaeltruong.ca/images/client.jpg) no-repeat;
-  background-size: 60px 60px;
-  border-radius: 50px;
-}
-.info {
-  display: block;
-  /* //float:left; */
-  margin-left: 0;
-}
-.title {
-  float: right;
-}
-.title p {
-  text-align: right;
-}
-table {
+.receipt-table {
   width: 100%;
+  margin-top: 10px;
   border-collapse: collapse;
 }
-/* td {
-    //padding: 5px 0 5px 15px;
-    //border: 1px solid #EEE
-  } */
-.tabletitle {
-  /* //padding: 5px; */
-  font-size: 0.5em;
-  background: #eee;
-}
-.service {
-  border-bottom: 1px solid #eee;
-}
-.item {
-  width: 24mm;
-}
-.itemtext {
-  font-size: 0.5em;
+
+.receipt-table th, .receipt-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
-#legalcopy {
-  margin-top: 5mm;
+.total-section {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  background: #f2f2f2;
+  text-align: right;
+  border-radius: 5px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.button-container button {
+  width: 48%;
 }

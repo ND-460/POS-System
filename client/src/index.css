@@ -4,6 +4,13 @@ body {
   font-family: "Sora", sans-serif;
 }
 
+.ant-modal {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+
 .item-button button {
   margin-top: 20px;
   width: 200px;

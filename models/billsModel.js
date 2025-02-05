@@ -1,43 +1,21 @@
 const mongoose = require("mongoose");
 
-const billSchema = mongoose.Schema(
+const billSchema = new mongoose.Schema(
   {
-    customerName: {
-      type: String,
-      required: true,
-    },
-    customerNumber: {
-      type: Number,
-      required: true,
-    },
-    totalAmount: {
-      type: Number,
-      required: true,
-    },
-    subTotal: {
-      type: Number,
-      required: true,
-    },
-    tax: {
-      type: Number,
-      required: true,
-    },
-    paymentMode: {
-      type: String,
-      required: true,
-    },
-    cartItems: {
-      type: Array,
-      required: true,
-    },
-    date: {
-      type: Date,
-      default: Date.now(),
-    },
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false }, 
+    cashier: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    items: [
+      {
+        item: { type: mongoose.Schema.Types.ObjectId, ref: "Item", required: true },
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true },
+      },
+    ],
+    totalAmount: { type: Number, required: true },
+    taxAmount: { type: Number, default: 0 }, // -Default value set
+    paymentMethod: { type: String, enum: ["cash", "cheque", "loyalty points", "UPI"], required: true },
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
-const Bills = mongoose.model("bills", billSchema);
-
-module.exports = Bills;
+module.exports = mongoose.model("Bill", billSchema);

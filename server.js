@@ -14,11 +14,20 @@ connectDb();
 const app = express();
 
 //middlwares
-app.use(cors());
+const corsOptions = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization"
+};
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(morgan("dev"));
+
+app.use(cors(corsOptions));
+const categoryRoutes = require("./routes/categoryRoutes");
+app.use("/api/categories", categoryRoutes);
+
 
 //routes
 app.use("/api/items", require("./routes/itemRoutes"));

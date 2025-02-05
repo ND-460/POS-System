@@ -1,0 +1,85 @@
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button, Spin, message } from "antd";
+import axios from "axios";
+import "../styles/InvoiceStyles.css";
+
+const ReceiptPage = () => {
+  const { billId } = useParams(); // -Get Bill ID from URL
+  const navigate = useNavigate(); // -For revert back button
+  const [bill, setBill] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBill = async () => {
+      try {
+        console.log(`-Fetching bill with ID: ${billId}`);
+        const { data } = await axios.get(`http://localhost:8080/api/bills/${billId}`);
+        console.log("-Bill Fetched:", data);
+        setBill(data);
+      } catch (error) {
+        console.error("- Error fetching bill:", error);
+        message.error("Error fetching receipt.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBill();
+  }, [billId]);
+
+  useEffect(() => {
+    if (bill) {
+      console.log("🖨 Printing Receipt...");
+      setTimeout(() => window.print(), 1000);
+    }
+  }, [bill]);
+
+  if (loading) return <Spin size="large" className="loading-spinner" />;
+
+  return (
+    <div className="receipt-container">
+      <h2 className="receipt-header">🧾 Receipt</h2>
+
+      <div className="receipt-info">
+        <span><strong>Bill ID:</strong> {bill._id}</span>
+        <span><strong>Date:</strong> {new Date(bill.createdAt).toLocaleString()}</span>
+      </div>
+      <div className="receipt-info">
+        <span><strong>Cashier:</strong> {bill.cashier.name}</span>
+        <span><strong>Customer:</strong> {bill.customerName ? bill.customerName : "Guest"}</span>
+      </div>
+
+      <table className="receipt-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bill.items.map((item, index) => (
+            <tr key={index}>
+              <td>{item.item.name}</td>
+              <td>{item.quantity}</td>
+              <td>${item.price.toFixed(2)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="total-section">
+        <strong>Total: ${bill.totalAmount.toFixed(2)}</strong>
+      </div>
+      <p><strong>Payment Method:</strong> {bill.paymentMethod}</p>
+
+      <div className="button-container">
+        <Button type="primary" onClick={() => window.print()}>🖨 Print Again</Button>
+        <Button danger onClick={() => navigate("/cashier")}>🔙 Revert Back</Button>
+      </div>
+    </div>
+  );
+};
+
+export default ReceiptPage;

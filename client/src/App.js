@@ -1,72 +1,36 @@
-import "antd/dist/antd.min.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import CartPage from "./pages/CartPage";
-import Homepage from "./pages/Homepage";
-import ItemPage from "./pages/ItemPage";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
-import BillsPage from "./pages/BillsPage";
-import CutomerPage from "./pages/CutomerPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import CashierTransaction from "./pages/CashierTransaction";
+import CartPage from "./pages/CartPage";
+import ReceiptPage from "./pages/ReceiptPage";
 
-function App() {
+
+
+const App = () => {
+  const user = useSelector((state) => state.auth.user);
+
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Homepage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/items"
-            element={
-              <ProtectedRoute>
-                <ItemPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cart"
-            element={
-              <ProtectedRoute>
-                <CartPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/bills"
-            element={
-              <ProtectedRoute>
-                <BillsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/customers"
-            element={
-              <ProtectedRoute>
-                <CutomerPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    <Router>
+      <Routes>
+        
+        <Route path="/login" element={<Login />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/receipt/:billId" element={<ReceiptPage />} />
+        {user ? (
+          <>
+            <Route path="/" element={<Navigate to={user.role === "admin" ? "/admin" : "/cashier"} />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/cashier" element={<CashierTransaction />} />
+          </>
+        ) : (
+          <Route path="*" element={<Navigate to="/login" />} />
+        )}
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
-
-export function ProtectedRoute({ children }) {
-  if (localStorage.getItem("auth")) {
-    return children;
-  } else {
-    return <Navigate to="/login" />;
-  }
-}

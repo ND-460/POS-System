@@ -5,6 +5,9 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import store from "./redux/store";
+import "antd/dist/antd.css"; // -Import Ant Design Styles
+import "./index.css"; // -Import Custom Styles
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

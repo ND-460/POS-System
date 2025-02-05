@@ -1,95 +1,62 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Layout, Menu } from "antd";
-import { Link, useNavigate } from "react-router-dom";
 import {
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  UserOutlined,
   LogoutOutlined,
   HomeOutlined,
   CopyOutlined,
   UnorderedListOutlined,
-  ShoppingCartOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
-import "../styles/DefaultLayout.css";
-import Spinner from "./Spinner";
+import { useDispatch, useSelector } from "react-redux";
+
 const { Header, Sider, Content } = Layout;
 
 const DefaultLayout = ({ children }) => {
   const navigate = useNavigate();
-  const { cartItems, loading } = useSelector((state) => state.rootReducer);
-  const [collapsed, setCollapsed] = useState(false);
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth); // Get logged-in user
 
-  const toggle = () => {
-    setCollapsed(!collapsed);
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT_USER" }); // -Clear Redux State
+    localStorage.removeItem("auth"); // -Clear Local Storage
+    navigate("/login"); // -Redirect to Login
   };
-  //to get localstorage data
-  useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
+  console.log("DefaultLayout Loaded");
 
   return (
     <Layout>
-      {loading && <Spinner />}
-      <Sider trigger={null} collapsible collapsed={collapsed}>
+      <Sider theme="dark">
         <div className="logo">
-          <h1 className="text-center text-light font-wight-bold mt-4">POS</h1>
+          <h1 className="text-center text-light font-weight-bold mt-4">POS</h1>
         </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={window.location.pathname}
-        >
-          <Menu.Item key="/" icon={<HomeOutlined />}>
-            <Link to="/">Home</Link>
+        <Menu theme="dark" mode="inline">
+          <Menu.Item key="/" icon={<HomeOutlined />} onClick={() => navigate("/")}>
+            Home
           </Menu.Item>
-          <Menu.Item key="/bills" icon={<CopyOutlined />}>
-            <Link to="/bills">Bills</Link>
-          </Menu.Item>
-          <Menu.Item key="/items" icon={<UnorderedListOutlined />}>
-            <Link to="/items">Items</Link>
-          </Menu.Item>
-          <Menu.Item key="/customers" icon={<UserOutlined />}>
-            <Link to="/customers">Cutomers</Link>
-          </Menu.Item>
-          <Menu.Item
-            key="/logout"
-            icon={<LogoutOutlined />}
-            onClick={() => {
-              localStorage.removeItem("auth");
-              navigate("/login");
-            }}
-          >
+          {user?.role === "admin" && (
+            <Menu.Item key="/admin" icon={<UnorderedListOutlined />} onClick={() => navigate("/admin")}>
+              Admin Dashboard
+            </Menu.Item>
+          )}
+          {user?.role === "cashier" && (
+            <Menu.Item key="/cashier" icon={<CopyOutlined />} onClick={() => navigate("/cashier")}>
+              Cashier Transactions
+            </Menu.Item>
+          )}
+          {/* <Menu.Item key="/customers" icon={<UserOutlined />} onClick={() => navigate("/customers")}>
+            Customers
+          </Menu.Item> */}
+          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Logout
           </Menu.Item>
         </Menu>
       </Sider>
-      <Layout className="site-layout">
-        <Header className="site-layout-background" style={{ padding: 0 }}>
-          {React.createElement(
-            collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
-            {
-              className: "trigger",
-              onClick: toggle,
-            }
-          )}
-          <div
-            className="cart-item d-flex jusitfy-content-space-between flex-row"
-            onClick={() => navigate("/cart")}
-          >
-            <p>{cartItems.length}</p>
-            <ShoppingCartOutlined />
-          </div>
+      <Layout>
+        <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
+          <h2>Welcome, {user?.name || "User"}</h2>
         </Header>
-        <Content
-          className="site-layout-background"
-          style={{
-            margin: "24px 16px",
-            padding: 24,
-            minHeight: 280,
-          }}
-        >
+        <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
           {children}
         </Content>
       </Layout>

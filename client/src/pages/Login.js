@@ -1,64 +1,54 @@
-import React, { useEffect } from "react";
-import { Form, Input, Button } from "antd";
-import { Link, useNavigate } from "react-router-dom";
-import { message } from "antd";
-import axios from "axios";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { message, Form, Input, Button, Card, Typography } from "antd";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import "../styles/Login.css"; // -Import custom styles
+
+const { Title } = Typography;
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleSubmit = async (value) => {
+
+  const handleLogin = async (values) => {
+    setLoading(true);
     try {
-      dispatch({
-        type: "SHOW_LOADING",
-      });
-      const res = await axios.post("/api/users/login", value);
-      dispatch({ type: "HIDE_LOADING" });
-      message.success("user login Succesfully");
-      localStorage.setItem("auth", JSON.stringify(res.data));
-      navigate("/");
+      const { data } = await axios.post("http://localhost:8080/api/users/login", values);
+      dispatch({ type: "LOGIN_SUCCESS", payload: data });
+      message.success("Login successful!");
+
+      if (data.user.role === "admin") {
+        navigate("/admin");
+      } else if (data.user.role === "cashier") {
+        navigate("/cashier");
+      }
     } catch (error) {
-      dispatch({ type: "HIDE_LOADING" });
-      message.error("Something Went Wrong");
-      console.log(error);
+      message.error("Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
-  //currently login  user
-  useEffect(() => {
-    if (localStorage.getItem("auth")) {
-      localStorage.getItem("auth");
-      navigate("/");
-    }
-  }, [navigate]);
   return (
-    <>
-      <div className="register">
-        <div className="regsiter-form">
-          <h1>POS APP</h1>
-          <h3>Login Page</h3>
-          <Form layout="vertical" onFinish={handleSubmit}>
-            <Form.Item name="userId" label="User ID">
-              <Input />
-            </Form.Item>
-            <Form.Item name="password" label="Password">
-              <Input type="password" />
-            </Form.Item>
-
-            <div className="d-flex justify-content-between">
-              <p>
-                not a user Please
-                <Link to="/register"> Register Here !</Link>
-              </p>
-              <Button type="primary" htmlType="submit">
-                Login
-              </Button>
-            </div>
-          </Form>
-        </div>
-      </div>
-    </>
+    <div className="login-container">
+      <Card className="login-card">
+        <Title level={2} className="login-title">Welcome to POS</Title>
+        <Form onFinish={handleLogin} layout="vertical">
+          <Form.Item name="email" rules={[{ required: true, message: "Enter your email" }]}>
+            <Input prefix={<UserOutlined />} placeholder="Email" />
+          </Form.Item>
+          <Form.Item name="password" rules={[{ required: true, message: "Enter your password" }]}>
+            <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+          </Form.Item>
+          <Button type="primary" block htmlType="submit" loading={loading} className="login-button">
+            Login
+          </Button>
+        </Form>
+      </Card>
+    </div>
   );
 };
 

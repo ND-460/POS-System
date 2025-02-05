@@ -1,27 +1,17 @@
 const mongoose = require("mongoose");
 
-const itemSchema = mongoose.Schema(
+const itemSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
-    category: {
-      type: String,
-      required: true,
-    },
-    image: {
-      type: String,
-      required: true,
-    },
+    name: { type: String, required: true },
+  description: { type: String },
+  price: { type: Number, required: true },
+  stock: { type: Number, required: true },
+  category: { type: String, required: true },
+  barcode: { type: String, unique: true, required: true },
+  discount: { type: Number, default: 0 }, // Discount in percentage
+  lowStockAlert: { type: Number, default: 5 }, // Alert when stock falls below this
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
-const Items = mongoose.model("Items", itemSchema);
-
-module.exports = Items;
+module.exports = mongoose.model("Item", itemSchema);
