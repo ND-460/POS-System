@@ -27,15 +27,17 @@ Point of Sale (POS) application built using the MERN stack (MongoDB, Express.js,
 
 ## Screenshots
 
-![1708780170883](image/README/1708780170883.png)
+![Login](./document/Login.png)
 
-![1708780195961](image/README/1708780195961.png)
+![Cashier Dashboard](./document/Cashier.png)
 
-![1708780235300](image/README/1708780235300.png)
+![Receipt](./document/Reciept.png)
 
-![1708780256197](image/README/1708780256197.png)
+![AdminItem](./document/AdminItems.png)
 
-![1708780295635](image/README/1708780295635.png)
+![AdminCategories](./document/AdminCategories.png)
+
+![AdminRolesControl](./document/AdminRolesControl.png)
 
 ## Usage
 
