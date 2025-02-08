@@ -78,6 +78,21 @@ const AdminManageCashiers = () => {
     }
   };
 
+  const handleDelete = async (cashierId) => {
+    try {
+      console.log(` Deleting Cashier ID: ${cashierId}`);
+      await axios.delete(`http://localhost:8080/api/users/cashiers/${cashierId}`);
+      message.success("Cashier deleted successfully!");
+  
+      //  Remove cashier from UI after deletion
+      setCashiers((prevCashiers) => prevCashiers.filter((cashier) => cashier._id !== cashierId));
+    } catch (error) {
+      console.error(" Error deleting cashier:", error.response?.data || error.message);
+      message.error(error.response?.data?.message || "Error deleting cashier");
+    }
+  };
+  
+
   return (
     <div>
       <h2>Manage Cashiers</h2>
@@ -125,10 +140,13 @@ const AdminManageCashiers = () => {
           <Form.Item name="mobile" label="Mobile" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
+          <Form.Item name="birthdate" label="Birthdate">
+            <Input type="date" />
+          </Form.Item>
           <Form.Item name="role" label="Role" rules={[{ required: true }]}>
             <Select>
               <Option value="cashier">Cashier</Option>
-              <Option value="admin">Admin</Option> {/* -Allow role change */}
+              {/* <Option value="admin">Admin</Option> -Allow role change */}
             </Select>
           </Form.Item>
           {!editingCashier && (

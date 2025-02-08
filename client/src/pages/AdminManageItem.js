@@ -40,32 +40,49 @@ const AdminManageItems = () => {
   const handleSubmit = async (values) => {
     try {
       if (editingItem) {
-        // Update item
+        console.log(` Updating Item ID: ${editingItem}`);
         await axios.put(`http://localhost:8080/api/items/${editingItem}`, values);
         message.success("Item updated successfully!");
+        
+        //  Update the item in the state
+        setItems((prevItems) =>
+          prevItems.map((item) =>
+            item._id === editingItem ? { ...item, ...values } : item
+          )
+        );
+        
         setEditingItem(null);
       } else {
-        // Add new item
+        console.log(" Adding New Item");
         await axios.post("http://localhost:8080/api/items/add", values);
         message.success("Item added successfully!");
       }
+      
       form.resetFields();
-      loadItems();
+      loadItems(); //  Reload items after update/add
     } catch (error) {
+      console.error(" Error saving item:", error.response?.data || error.message);
       message.error(error.response?.data?.message || "Error saving item");
     }
   };
+  
 
   // Delete item
   const handleDelete = async (id) => {
     try {
+      console.log(`🗑️ Deleting Item ID: ${id}`);
       await axios.delete(`http://localhost:8080/api/items/${id}`);
       message.success("Item deleted successfully!");
-      loadItems();
+  
+      //  Remove the item from state after deletion
+      setItems((prevItems) => prevItems.filter((item) => item._id !== id));
     } catch (error) {
-      message.error("Error deleting item");
+      console.error(" Error deleting item:", error.response?.data || error.message);
+      message.error(error.response?.data?.message || "Error deleting item");
     }
   };
+  
+  
 
   // Set item for editing
   const handleEdit = (item) => {
