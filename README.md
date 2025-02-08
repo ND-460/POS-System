@@ -49,12 +49,3 @@ Point of Sale (POS) application built using the MERN stack (MongoDB, Express.js,
 
 Contributions are welcome! Feel free to open issues or submit pull requests to contribute to the development of this application.
 
-## License
-
-<!-- This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. -->
-
----
-<!-- # POS-System -->
-<!-- # POS-System -->
-<!-- # POS-System -->
-<!-- # POS-System -->
