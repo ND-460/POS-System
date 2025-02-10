@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import CashierTransaction from "./pages/CashierTransaction";
-import CartPage from "./pages/CartPage";
+// import CartPage from "./pages/CartPage";
 import ReceiptPage from "./pages/ReceiptPage";
 
 
@@ -17,7 +17,7 @@ const App = () => {
       <Routes>
         
         <Route path="/login" element={<Login />} />
-        <Route path="/cart" element={<CartPage />} />
+        {/* <Route path="/cart" element={<CartPage />} /> */}
         <Route path="/receipt/:billId" element={<ReceiptPage />} />
         {user ? (
           <>
