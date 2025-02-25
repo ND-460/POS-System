@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { loginController, registerController, getCashiers, updateCashier, deleteCashier, getCustomers } = require("../controllers/userController");
+const passport = require("passport");
+const { loginController, registerController, getCashiers, updateCashier, deleteCashier, getCustomers,getPastOrders,getLoyaltyPoints,generateQrLoginUrl,googleAuth,googleAuthCallback } = require("../controllers/userController");
+
+// - Fetch Customer Loyalty Points
+router.get("/:id/loyalty-points", getLoyaltyPoints);
+
 
 // - Login Route
 router.post("/login", loginController);
@@ -20,4 +25,15 @@ router.delete("/cashiers/:id", deleteCashier);
 // - Get All Customers
 router.get("/customers", getCustomers);
 
+// - Fetch Orders for a Customer
+router.get("/:customerId/orders", getPastOrders);
+
+// ✅ Route to generate QR Code login URL
+router.get("/qr-login-url", generateQrLoginUrl);
+
+// ✅ Google Authentication Route
+router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+
+// ✅ Google Auth Callback Route
+router.get("/auth/google/callback", googleAuthCallback);
 module.exports = router;

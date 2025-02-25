@@ -70,7 +70,7 @@ const AdminManageItems = () => {
   // Delete item
   const handleDelete = async (id) => {
     try {
-      console.log(`🗑️ Deleting Item ID: ${id}`);
+      console.log(` Deleting Item ID: ${id}`);
       await axios.delete(`http://localhost:8080/api/items/${id}`);
       message.success("Item deleted successfully!");
   

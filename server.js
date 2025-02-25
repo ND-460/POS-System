@@ -3,7 +3,10 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotanv = require("dotenv");
+const passport = require("passport");
+const session = require("express-session");
 const { bgCyan } = require("colors");
+require("./config/passport");
 require("colors");
 const connectDb = require("./config/config");
 //dotenv config
@@ -26,6 +29,23 @@ app.use(morgan("dev"));
 
 app.use(cors(corsOptions));
 const categoryRoutes = require("./routes/categoryRoutes");
+
+// Session Middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "default_secret",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // Set to `true` if using HTTPS
+  })
+);
+
+// Initialize Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use("/api/categories", categoryRoutes);
 
 

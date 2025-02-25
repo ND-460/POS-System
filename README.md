@@ -39,6 +39,8 @@ Point of Sale (POS) application built using the MERN stack (MongoDB, Express.js,
 
 ![AdminRolesControl](./document/AdminRolesControl.png)
 
+![CustomerDashboard](./document//Screenshot%20from%202025-02-21%2016-13-49.png)
+
 ## Usage
 
 1. Register a new user account or login with existing credentials.

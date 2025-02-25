@@ -24,6 +24,8 @@ const Login = () => {
         navigate("/admin");
       } else if (data.user.role === "cashier") {
         navigate("/cashier");
+      }else if (data.user.role === "customer"){
+        navigate("/customer");
       }
     } catch (error) {
       message.error("Invalid credentials");
