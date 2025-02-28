@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Select, Card, message } from "antd";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import DefaultLayout from "../components/DefaultLayout";
 
@@ -22,20 +23,20 @@ const CustomerDashboard = () => {
   const fetchOrders = async () => {
     try {
       const storedUser = JSON.parse(localStorage.getItem("auth"));
-      const customerId = storedUser?._id; // ✅ Ensure we get customer ID
+      const customerId = storedUser?._id; // - Ensure we get customer ID
 
       if (!customerId) {
-        console.error("❌ Customer ID is missing!");
+        console.error("- Customer ID is missing!");
         message.error("Failed to load orders. Please login again.");
         return;
       }
 
-      console.log(`📌 Fetching orders for Customer ID: ${customerId}`); // ✅ Debugging
+      console.log(`- Fetching orders for Customer ID: ${customerId}`); // - Debugging
 
       const { data } = await axios.get(`http://localhost:8080/api/users/${customerId}/orders`);
       setOrders(data);
     } catch (error) {
-      console.error("❌ Error fetching orders:", error);
+      console.error("- Error fetching orders:", error);
       message.error("Failed to load orders");
     }
   };
@@ -47,24 +48,19 @@ const CustomerDashboard = () => {
       const user = JSON.parse(localStorage.getItem("auth"));
       
       if (!user || !user._id) {
-        console.error("❌ No customer ID found in localStorage");
+        console.error("- No customer ID found in localStorage");
         return;
       }
   
-      console.log(`🔍 Fetching loyalty points for: ${user._id}`);
+      console.log(`- Fetching loyalty points for: ${user._id}`);
   
       const { data } = await axios.get(`http://localhost:8080/api/users/${user._id}/loyalty-points`);
       
       setLoyaltyPoints(data.loyaltyPoints);
     } catch (error) {
-      console.error("❌ Error fetching loyalty points:", error);
+      console.error("- Error fetching loyalty points:", error);
     }
   };
-  
-  
-  
-  
-
 
   // -Handle Sorting
   const handleSort = (value) => {
@@ -129,9 +125,9 @@ const CustomerDashboard = () => {
           { title: "Total Amount", dataIndex: "totalAmount", render: (amount) => `$${amount.toFixed(2)}` },
           { title: "Payment Method", dataIndex: "paymentMethod" },
           {
-            title: "Items",
-            dataIndex: "items",
-            render: (items) => items.map((i) => `${i.item.name} (x${i.quantity})`).join(", "),
+            title: "Receipt",
+            dataIndex: "_id", // - Use bill ID to link to receipt
+            render: (billId) => <Link to={`/receipt/${billId}`}>🧾 View Receipt</Link>,
           },
         ]}
         rowKey="_id"

@@ -33,18 +33,15 @@ const categoryRoutes = require("./routes/categoryRoutes");
 // Session Middleware
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "default_secret",
+    secret: process.env.SESSION_SECRET || "secret-key",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // Set to `true` if using HTTPS
   })
 );
 
-// Initialize Passport Middleware
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(passport.initialize());
-app.use(passport.session());
+
 
 app.use("/api/categories", categoryRoutes);
 

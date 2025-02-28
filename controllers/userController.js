@@ -9,21 +9,21 @@ const client = new OAuth2Client("YOUR_GOOGLE_CLIENT_ID");
 const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log("📌 Login Attempt:", email, password);
+    console.log("- Login Attempt:", email, password);
 
     const user = await User.findOne({ email }).select("+password");
-    console.log("📌 User Found:", user);
+    console.log("- User Found:", user);
 
     if (!user || user.password !== password) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    console.log("✅ Login Successful for:", user.role);
+    console.log("- Login Successful for:", user.role);
 
-    // ✅ Send user object in response
+    // - Send user object in response
     res.status(200).json({ message: "Login successful", user });
   } catch (error) {
-    console.error("❌ Login Error:", error);
+    console.error("- Login Error:", error);
     res.status(500).json({ message: "Server error", error });
   }
 };
@@ -32,43 +32,84 @@ const loginController = async (req, res) => {
 
 const generateQrLoginUrl = async (req, res) => {
   try {
-    const loginUrl = `http://localhost:3000/customer-login`; // ✅ Change as per frontend
+    const loginUrl = `http://localhost:3000/customer-login`; // - Change as per frontend
     res.json({ qrUrl: loginUrl });
   } catch (error) {
-    console.error("❌ Error generating QR Code URL:", error);
+    console.error("- Error generating QR Code URL:", error);
     res.status(500).json({ message: "Failed to generate QR Code URL" });
   }
 };
 
-// ✅ Google Authentication Handler
+// - Google Authentication Handler
 const googleAuth = passport.authenticate("google", { scope: ["profile", "email"] });
 
-// ✅ Google Authentication Callback Handler
-const googleAuthCallback = (req, res, next) => {
-  passport.authenticate("google", { failureRedirect: "/customer-login" }, async (err, user) => {
-    if (err || !user) {
-      return res.redirect("/customer-login?error=GoogleAuthFailed");
+// - Google Authentication Callback Handler
+const googleAuthCallback = async (req, res, next) => {
+  passport.authenticate("google", async (err, user, info) => {
+    if (err) {
+      console.error("🔥 Google Auth Error:", err);
+      return res.redirect("http://localhost:3000/customer-auth?error=GoogleAuthFailed");
+    }
+    if (!user) {
+      console.warn("⚠️ Google Auth Failed: No user found");
+      return res.redirect("http://localhost:3000/customer-auth?error=GoogleAuthFailed");
     }
 
-    // ✅ Generate JWT Token
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    // - Ensure user is saved in DB
+    const existingUser = await User.findOne({ email: user.email });
+    if (!existingUser) {
+      const newUser = new User({
+        name: user.name,
+        email: user.email,
+        role: "customer",
+        isVerified: true, 
+      });
+      await newUser.save();
+      console.log("- New Google User Saved:", newUser);
+    }
 
-    // ✅ Redirect to frontend with token
-    res.redirect(`http://localhost:3000/customer-dashboard?token=${token}`);
+    req.login(user, (err) => {
+      if (err) {
+        console.error("🔥 Error logging in user:", err);
+        return res.redirect("http://localhost:3000/customer-auth?error=GoogleAuthFailed");
+      }
+      return res.redirect(`http://localhost:3000/customer-auth?googleSuccess=true&userId=${user._id}`);
+    });
   })(req, res, next);
 };
 
 
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid User ID format" });
+    }
+
+    const user = await User.findById(id);
+    console.log("- Fetching User with ID:", req.params.id);
+
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("- Error fetching user:", error);
+    res.status(500).json({ message: "Error fetching user", error });
+  }
+};
+
 const registerController = async (req, res) => {
   try {
-    console.log("📌 Received Registration Data:", req.body); // ✅ Log incoming data
+    console.log("- Received Registration Data:", req.body); // - Log incoming data
 
     const { name, email, mobile, birthdate, password } = req.body;
 
     if (!name || !email || !mobile || !birthdate || !password) {
-      console.log("❌ Missing required fields!"); // ✅ Log missing fields
+      console.log("- Missing required fields!"); // - Log missing fields
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -90,7 +131,7 @@ const registerController = async (req, res) => {
 
     res.status(201).json({ message: "Customer registered successfully!", user: newUser });
   } catch (error) {
-    console.error("❌ Error registering customer:", error);
+    console.error("- Error registering customer:", error);
     res.status(500).json({ message: "Registration failed", error });
   }
 };
@@ -142,6 +183,7 @@ const deleteCashier = async (req, res) => {
 };
 
 
+
 // - Get All Customers
 const getCustomers = async (req, res) => {
   try {
@@ -155,19 +197,22 @@ const getCustomers = async (req, res) => {
 
 const getPastOrders = async (req, res) => {
   try {
-    const { customerId } = req.params; // ✅ Get customerId from params
+    const { customerId } = req.params; // - Get customerId from params
 
     if (!customerId || customerId === "undefined") {
-      console.error("❌ Invalid Customer ID:", customerId);
+      console.error("- Invalid Customer ID:", customerId);
       return res.status(400).json({ message: "Invalid customer ID" });
     }
 
-    console.log(`📌 Fetching Orders for Customer ID: ${customerId}`); // ✅ Debugging
+    console.log(`- Fetching Orders for Customer ID: ${customerId}`); // - Debugging
 
-    const orders = await Bill.find({ customer: customerId }).populate("items.item");
-    res.status(200).json(orders);
+    const orders = await Bill.find({ customer: customerId })
+    .populate("items.item", "name")
+    .select("_id createdAt totalAmount paymentMethod");
+
+  res.status(200).json(orders);
   } catch (error) {
-    console.error("❌ Error fetching customer orders:", error);
+    console.error("- Error fetching customer orders:", error);
     res.status(500).json({ message: "Error fetching orders", error });
   }
 }
@@ -175,27 +220,27 @@ const getPastOrders = async (req, res) => {
 const getLoyaltyPoints = async (req, res) => {
   try {
     const customerId = req.params.id;
-    console.log(`🔍 Fetching loyalty points for Customer ID: ${customerId}`);
+    console.log(`- Fetching loyalty points for Customer ID: ${customerId}`);
 
-    // ✅ Ensure customerId is a valid ObjectId
+    // - Ensure customerId is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(customerId)) {
-      console.log("❌ Invalid ObjectId Format:", customerId);
+      console.log("- Invalid ObjectId Format:", customerId);
       return res.status(400).json({ message: "Invalid customer ID format" });
     }
 
-    // ✅ Convert ID to ObjectId and query MongoDB
+    // - Convert ID to ObjectId and query MongoDB
     const customer = await User.findById(customerId);
 
-    console.log("📌 Found Customer:", customer);
+    console.log("- Found Customer:", customer);
 
     if (!customer) {
-      console.log("❌ Customer NOT FOUND!");
+      console.log("- Customer NOT FOUND!");
       return res.status(404).json({ message: "Customer not found" });
     }
 
     res.json({ loyaltyPoints: customer.loyaltyPoints });
   } catch (error) {
-    console.error("❌ Error fetching loyalty points:", error);
+    console.error("- Error fetching loyalty points:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -211,5 +256,6 @@ module.exports = {
   getLoyaltyPoints,
   generateQrLoginUrl,
   googleAuth,
-  googleAuthCallback
+  googleAuthCallback,
+  getUserById
 };

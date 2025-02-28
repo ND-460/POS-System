@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { loginController, registerController, getCashiers, updateCashier, deleteCashier, getCustomers,getPastOrders,getLoyaltyPoints,generateQrLoginUrl,googleAuth,googleAuthCallback } = require("../controllers/userController");
+const { loginController, registerController, getCashiers, updateCashier, deleteCashier, getCustomers,getPastOrders,getLoyaltyPoints,generateQrLoginUrl,googleAuth,googleAuthCallback,getUserById } = require("../controllers/userController");
 
 // - Fetch Customer Loyalty Points
 router.get("/:id/loyalty-points", getLoyaltyPoints);
 
+router.get("/:id", getUserById);
 
 // - Login Route
 router.post("/login", loginController);
@@ -28,12 +29,12 @@ router.get("/customers", getCustomers);
 // - Fetch Orders for a Customer
 router.get("/:customerId/orders", getPastOrders);
 
-// ✅ Route to generate QR Code login URL
+// - Route to generate QR Code login URL
 router.get("/qr-login-url", generateQrLoginUrl);
 
-// ✅ Google Authentication Route
+// - Google Authentication Route
 router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-// ✅ Google Auth Callback Route
+// - Google Auth Callback Route
 router.get("/auth/google/callback", googleAuthCallback);
 module.exports = router;

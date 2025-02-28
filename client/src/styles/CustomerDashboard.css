@@ -1,0 +1,51 @@
+.customer-dashboard {
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+  }
+  
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-header h2 {
+    color: #333;
+  }
+  
+  .loyalty-points {
+    font-size: 18px;
+    font-weight: bold;
+    color: #28a745;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .orders-section {
+    margin-top: 30px;
+  }
+  
+  .orders-section h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #555;
+  }
+  
+  .order-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+  }
+  
+  .order-card p {
+    margin: 5px 0;
+  }
+  
+  .filters {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  

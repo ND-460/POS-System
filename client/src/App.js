@@ -10,8 +10,8 @@ import ReceiptPage from "./pages/ReceiptPage";
 import CustomerHome from "./pages/CustomerHome";
 
 const App = () => {
-  const storedUser = JSON.parse(localStorage.getItem("auth")); // ✅ Get user from localStorage
-const user = useSelector((state) => state.auth.user) || storedUser; // ✅ Fallback to localStorage user
+  const storedUser = JSON.parse(localStorage.getItem("auth")); // - Get user from localStorage
+const user = useSelector((state) => state.auth.user) || storedUser; // - Fallback to localStorage user
 
 return (
   <Router>

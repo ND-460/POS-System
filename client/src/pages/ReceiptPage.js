@@ -47,7 +47,7 @@ const ReceiptPage = () => {
       </div>
       <div className="receipt-info">
         <span><strong>Cashier:</strong> {bill.cashier.name}</span>
-        <span><strong>Customer:</strong> {bill.customerName ? bill.customerName : "Guest"}</span>
+        <span><strong>Customer:</strong> {bill.customerName || "Guest"}</span>
       </div>
 
       <table className="receipt-table">
@@ -76,7 +76,14 @@ const ReceiptPage = () => {
 
       <div className="button-container">
         <Button type="primary" onClick={() => window.print()}>🖨 Print Again</Button>
-        <Button danger onClick={() => navigate("/cashier")}>🔙 Revert Back</Button>
+            <Button danger onClick={() => {
+      const user = JSON.parse(localStorage.getItem("auth"));
+      const redirectPath = user?.role === "customer" ? "/customer" : "/cashier";
+      navigate(redirectPath);
+    }}>
+      🔙 Revert Back
+    </Button>
+
       </div>
     </div>
   );
