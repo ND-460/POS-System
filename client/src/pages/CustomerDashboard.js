@@ -18,7 +18,7 @@ const CustomerDashboard = () => {
     fetchOrders();
     fetchLoyaltyPoints();
   }, []);
-//ABCDEF
+//ABCDEFGH
   // -Fetch Customer's Past Orders
   const fetchOrders = async () => {
     try {
