@@ -18,7 +18,7 @@ const CustomerDashboard = () => {
     fetchOrders();
     fetchLoyaltyPoints();
   }, []);
-
+//ABCD
   // -Fetch Customer's Past Orders
   const fetchOrders = async () => {
     try {
@@ -33,7 +33,9 @@ const CustomerDashboard = () => {
 
       console.log(`- Fetching orders for Customer ID: ${customerId}`); // - Debugging
 
-      const { data } = await axios.get(`http://localhost:8080/api/users/${customerId}/orders`);
+      const { data } = await axios.get(
+        `http://localhost:8080/api/users/${customerId}/orders`
+      );
       setOrders(data);
     } catch (error) {
       console.error("- Error fetching orders:", error);
@@ -41,21 +43,22 @@ const CustomerDashboard = () => {
     }
   };
 
-
   // -Fetch Loyalty Points
   const fetchLoyaltyPoints = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("auth"));
-      
+
       if (!user || !user._id) {
         console.error("- No customer ID found in localStorage");
         return;
       }
-  
+
       console.log(`- Fetching loyalty points for: ${user._id}`);
-  
-      const { data } = await axios.get(`http://localhost:8080/api/users/${user._id}/loyalty-points`);
-      
+
+      const { data } = await axios.get(
+        `http://localhost:8080/api/users/${user._id}/loyalty-points`
+      );
+
       setLoyaltyPoints(data.loyaltyPoints);
     } catch (error) {
       console.error("- Error fetching loyalty points:", error);
@@ -68,9 +71,13 @@ const CustomerDashboard = () => {
     let sortedOrders = [...orders];
 
     if (value === "newest") {
-      sortedOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      sortedOrders.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
     } else if (value === "oldest") {
-      sortedOrders.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      sortedOrders.sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      );
     } else if (value === "high-to-low") {
       sortedOrders.sort((a, b) => b.totalAmount - a.totalAmount);
     } else if (value === "low-to-high") {
@@ -86,8 +93,8 @@ const CustomerDashboard = () => {
   };
 
   // -Filtered and Sorted Orders
-  const displayedOrders = orders.filter((order) => 
-    paymentFilter === "all" || order.paymentMethod === paymentFilter
+  const displayedOrders = orders.filter(
+    (order) => paymentFilter === "all" || order.paymentMethod === paymentFilter
   );
 
   return (
@@ -108,7 +115,11 @@ const CustomerDashboard = () => {
           <Option value="low-to-high">Sort: Low to High Amount</Option>
         </Select>
 
-        <Select value={paymentFilter} onChange={handleFilter} style={{ width: 200 }}>
+        <Select
+          value={paymentFilter}
+          onChange={handleFilter}
+          style={{ width: 200 }}
+        >
           <Option value="all">Filter: All Payments</Option>
           <Option value="cash">Cash</Option>
           <Option value="cheque">Cheque</Option>
@@ -121,13 +132,23 @@ const CustomerDashboard = () => {
       <Table
         dataSource={displayedOrders}
         columns={[
-          { title: "Date", dataIndex: "createdAt", render: (date) => new Date(date).toLocaleString() },
-          { title: "Total Amount", dataIndex: "totalAmount", render: (amount) => `$${amount.toFixed(2)}` },
+          {
+            title: "Date",
+            dataIndex: "createdAt",
+            render: (date) => new Date(date).toLocaleString(),
+          },
+          {
+            title: "Total Amount",
+            dataIndex: "totalAmount",
+            render: (amount) => `$${amount.toFixed(2)}`,
+          },
           { title: "Payment Method", dataIndex: "paymentMethod" },
           {
             title: "Receipt",
             dataIndex: "_id", // - Use bill ID to link to receipt
-            render: (billId) => <Link to={`/receipt/${billId}`}>🧾 View Receipt</Link>,
+            render: (billId) => (
+              <Link to={`/receipt/${billId}`}>🧾 View Receipt</Link>
+            ),
           },
         ]}
         rowKey="_id"
