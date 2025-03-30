@@ -84,15 +84,16 @@ const getUserById = async (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.log("- Invalid User ID format:", id);
       return res.status(400).json({ message: "Invalid User ID format" });
     }
 
-    const user = await User.findById(id);
-    console.log("- Fetching User with ID:", req.params.id);
+    const user = await User.findById(id).select("name mobile role"); // Fetch only necessary fields
+    console.log("- Fetching User with ID:", id);
 
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!user || user.role !== "customer") { // Ensure the user is a customer
+      console.log("- Customer not found for ID:", id);
+      return res.status(404).json({ message: "Customer not found" });
     }
 
     res.status(200).json(user);
@@ -106,9 +107,9 @@ const registerController = async (req, res) => {
   try {
     console.log("- Received Registration Data:", req.body); // - Log incoming data
 
-    const { name, email, mobile, birthdate, password } = req.body;
+    const { name, email, mobile, birthdate, password, role } = req.body;
 
-    if (!name || !email || !mobile || !birthdate || !password) {
+    if (!name || !email || !mobile || !birthdate || !password || !role) {
       console.log("- Missing required fields!"); // - Log missing fields
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -124,14 +125,14 @@ const registerController = async (req, res) => {
       mobile,
       birthdate,
       password,
-      role: "customer",
+      role, // Ensure role is set correctly
     });
 
     await newUser.save();
 
-    res.status(201).json({ message: "Customer registered successfully!", user: newUser });
+    res.status(201).json({ message: "User registered successfully!", user: newUser });
   } catch (error) {
-    console.error("- Error registering customer:", error);
+    console.error("- Error registering user:", error);
     res.status(500).json({ message: "Registration failed", error });
   }
 };
@@ -143,9 +144,12 @@ const registerController = async (req, res) => {
 // - Get All Cashiers
 const getCashiers = async (req, res) => {
   try {
+    console.log("- Fetching all cashiers"); // Debugging log
     const cashiers = await User.find({ role: "cashier" });
+    console.log(`- Found ${cashiers.length} cashiers`, cashiers); // Log fetched cashiers
     res.status(200).json(cashiers);
   } catch (error) {
+    console.error("- Error fetching cashiers:", error.message); // Add error message logging
     res.status(500).json({ message: "Error fetching cashiers", error });
   }
 };
@@ -164,6 +168,7 @@ const updateCashier = async (req, res) => {
     await cashier.save();
     res.status(200).json({ message: "Cashier updated successfully", cashier });
   } catch (error) {
+    console.error("Error updating cashier:", error);
     res.status(500).json({ message: "Error updating cashier", error });
   }
 };
@@ -177,7 +182,7 @@ const deleteCashier = async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Cashier deleted successfully!" });
   } catch (error) {
-    console.error(" Error deleting cashier:", error);
+    console.error("Error deleting cashier:", error);
     res.status(500).json({ message: "Error deleting cashier", error });
   }
 };

@@ -17,38 +17,38 @@ const AdminDashboard = () => {
 
   return (
     <DefaultLayout>
-    <Layout>
-      <Sider collapsible>
-        <div className="logo">Admin Panel</div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["items"]}
-          onClick={({ key }) => setSelectedSection(key)} // -Fix: Only show one section at a time
-        >
-          <Menu.Item key="items" icon={<UnorderedListOutlined />}>
-            Manage Items
-          </Menu.Item>
-          <Menu.Item key="categories" icon={<AppstoreOutlined />}>
-            Manage Categories
-          </Menu.Item>
-          <Menu.Item key="cashiers" icon={<UserOutlined />}>
-            Manage Cashiers
-          </Menu.Item>
-        </Menu>
-      </Sider>
-
       <Layout>
-        <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
-          <h2>Admin Dashboard</h2>
-        </Header>
-        <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
-          {selectedSection === "items" && <AdminManageItems />}
-          {selectedSection === "categories" && <AdminManageCategories />}
-          {selectedSection === "cashiers" && <AdminManageCashiers />}
-        </Content>
+        <Sider collapsible>
+          <div className="logo">Admin Panel</div>
+          <Menu
+            theme="dark"
+            mode="inline"
+            defaultSelectedKeys={["items"]}
+            onClick={({ key }) => setSelectedSection(key)}
+          >
+            <Menu.Item key="items" icon={<UnorderedListOutlined />}>
+              Manage Items
+            </Menu.Item>
+            <Menu.Item key="categories" icon={<AppstoreOutlined />}>
+              Manage Categories
+            </Menu.Item>
+            <Menu.Item key="cashiers" icon={<UserOutlined />}>
+              Manage Cashiers
+            </Menu.Item>
+          </Menu>
+        </Sider>
+
+        <Layout>
+          <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
+            <h2>Admin Dashboard</h2>
+          </Header>
+          <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
+            {selectedSection === "items" && <AdminManageItems />}
+            {selectedSection === "categories" && <AdminManageCategories />}
+            {selectedSection === "cashiers" && <AdminManageCashiers />}
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
     </DefaultLayout>
   );
 };

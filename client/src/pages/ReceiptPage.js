@@ -16,6 +16,18 @@ const ReceiptPage = () => {
         console.log(`-Fetching bill with ID: ${billId}`);
         const { data } = await axios.get(`http://localhost:8080/api/bills/${billId}`);
         console.log("-Bill Fetched:", data);
+
+        // Ensure customerName is set correctly
+        if (!data.customerName && data.customer) {
+          try {
+            const customerResponse = await axios.get(`http://localhost:8080/api/users/customers/${data.customer}`);
+            data.customerName = customerResponse.data?.name || "Guest";
+          } catch (error) {
+            console.warn("- Customer not found, defaulting to Guest");
+            data.customerName = "Guest"; // Fallback to Guest if customer is not found
+          }
+        }
+
         setBill(data);
       } catch (error) {
         console.error("- Error fetching bill:", error);

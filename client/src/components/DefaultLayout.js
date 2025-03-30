@@ -18,10 +18,30 @@ const DefaultLayout = ({ children }) => {
   const { user } = useSelector((state) => state.auth); // Get logged-in user
 
   const handleLogout = () => {
-    dispatch({ type: "LOGOUT_USER" }); // -Clear Redux State
-    localStorage.removeItem("auth"); // -Clear Local Storage
-    navigate("/login"); // -Redirect to Login
+    dispatch({ type: "LOGOUT_USER" }); // Clear Redux State
+    localStorage.removeItem("auth"); // Clear Local Storage
+
+    if (user?.role === "customer") {
+      navigate("/customer-auth"); // Redirect customers to /customer-auth
+    } else if (user?.role === "cashier" || user?.role === "admin") {
+      navigate("/login"); // Redirect cashiers and admins to /login
+    } else {
+      navigate("/login"); // Default fallback
+    }
   };
+
+  const handleHomeNavigation = () => {
+    if (user?.role === "admin") {
+      navigate("/admin"); // Redirect admin to /admin
+    } else if (user?.role === "cashier") {
+      navigate("/cashier"); // Redirect cashier to /cashier
+    } else if (user?.role === "customer") {
+      navigate("/customer"); // Redirect customer to /customer
+    } else {
+      navigate("/login"); // Default fallback for unauthenticated users
+    }
+  };
+
   console.log("DefaultLayout Loaded");
 
   return (
@@ -31,7 +51,7 @@ const DefaultLayout = ({ children }) => {
           <h1 className="text-center text-light font-weight-bold mt-4">POS</h1>
         </div>
         <Menu theme="dark" mode="inline">
-          <Menu.Item key="/" icon={<HomeOutlined />} onClick={() => navigate("/")}>
+          <Menu.Item key="/" icon={<HomeOutlined />} onClick={handleHomeNavigation}>
             Home
           </Menu.Item>
           {/* {user?.role === "admin" && (

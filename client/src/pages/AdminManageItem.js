@@ -9,6 +9,8 @@ const AdminManageItems = () => {
   const [categories, setCategories] = useState([]);
   const [form] = Form.useForm();
   const [editingItem, setEditingItem] = useState(null);
+  const [sortOption, setSortOption] = useState("name-asc");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   useEffect(() => {
     loadItems();
@@ -90,74 +92,126 @@ const AdminManageItems = () => {
     form.setFieldsValue(item);
   };
 
+  // Handle Sorting
+  const handleSort = (value) => {
+    setSortOption(value);
+    let sortedItems = [...items];
+
+    if (value === "name-asc") {
+      sortedItems.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (value === "name-desc") {
+      sortedItems.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (value === "price-asc") {
+      sortedItems.sort((a, b) => a.price - b.price);
+    } else if (value === "price-desc") {
+      sortedItems.sort((a, b) => b.price - a.price);
+    }
+
+    setItems(sortedItems);
+  };
+
+  // Handle Filtering
+  const handleFilter = (value) => {
+    setCategoryFilter(value);
+  };
+
+  // Filtered and Sorted Items
+  const displayedItems = items.filter(
+    (item) => categoryFilter === "all" || item.category === categoryFilter
+  );
+
   return (
     <div>
-      <h2>Manage Items</h2>
-
       {/* Item Form */}
-      <Form form={form} onFinish={handleSubmit} layout="vertical">
-        <Form.Item name="name" label="Item Name" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
+      <div style={{ border: "1px solid #ccc", padding: "16px", marginBottom: "16px", borderRadius: "8px" }}>
+        <h2>Manage Items</h2>
+        <Form form={form} onFinish={handleSubmit} layout="vertical">
+          <Form.Item name="name" label="Item Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
 
-        <Form.Item name="category" label="Category" rules={[{ required: true }]}>
-  <Select placeholder="Select a category">
-    {categories.length > 0 ? (
-      categories.map((cat) => (
-        <Option key={cat._id} value={cat.name}>
-          {cat.name}
-        </Option>
-      ))
-    ) : (
-      <Option disabled>No Categories Found</Option>
-    )}
-  </Select>
-</Form.Item>
+          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
+            <Select placeholder="Select a category">
+              {categories.length > 0 ? (
+                categories.map((cat) => (
+                  <Option key={cat._id} value={cat.name}>
+                    {cat.name}
+                  </Option>
+                ))
+              ) : (
+                <Option disabled>No Categories Found</Option>
+              )}
+            </Select>
+          </Form.Item>
 
+          <Form.Item name="barcode" label="Barcode" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
 
-        <Form.Item name="barcode" label="Barcode" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
+          <Form.Item name="price" label="Price" rules={[{ required: true, type: "number", min: 1 }]}>
+            <InputNumber />
+          </Form.Item>
 
-        <Form.Item name="price" label="Price" rules={[{ required: true, type: "number", min: 1 }]}>
-          <InputNumber />
-        </Form.Item>
+          <Form.Item name="stock" label="Stock Quantity" rules={[{ required: true, type: "number", min: 1 }]}>
+            <InputNumber />
+          </Form.Item>
 
-        <Form.Item name="stock" label="Stock Quantity" rules={[{ required: true, type: "number", min: 1 }]}>
-          <InputNumber />
-        </Form.Item>
+          <Form.Item name="discount" label="Discount (%)">
+            <InputNumber min={0} max={100} />
+          </Form.Item>
 
-        <Form.Item name="discount" label="Discount (%)">
-          <InputNumber min={0} max={100} />
-        </Form.Item>
+          <Button type="primary" htmlType="submit">
+            {editingItem ? "Update Item" : "Add Item"}
+          </Button>
+        </Form>
+      </div>
 
-        <Button type="primary" htmlType="submit">
-          {editingItem ? "Update Item" : "Add Item"}
-        </Button>
-      </Form>
+      {/* Item List Table with Sorting & Filtering Options */}
+      <div style={{ border: "1px solid #ccc", padding: "16px", borderRadius: "8px" }}>
+        <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+          <Select value={sortOption} onChange={handleSort} style={{ width: 200 }}>
+            <Option value="name-asc">Sort: Name (A-Z)</Option>
+            <Option value="name-desc">Sort: Name (Z-A)</Option>
+            <Option value="price-asc">Sort: Price (Low to High)</Option>
+            <Option value="price-desc">Sort: Price (High to Low)</Option>
+          </Select>
 
-      {/* Item List Table */}
-      <Table
-        dataSource={items}
-        columns={[
-          { title: "Name", dataIndex: "name" },
-          { title: "Category", dataIndex: "category" },
-          { title: "Price", dataIndex: "price" },
-          { title: "Stock", dataIndex: "stock" },
-          {
-            title: "Action",
-            render: (_, record) => (
-              <>
-                <Button onClick={() => handleEdit(record)}>Edit</Button>
-                <Button type="danger" onClick={() => handleDelete(record._id)}>
-                  Delete
-                </Button>
-              </>
-            ),
-          },
-        ]}
-        rowKey="_id"
-      />
+          <Select
+            value={categoryFilter}
+            onChange={handleFilter}
+            style={{ width: 200 }}
+          >
+            <Option value="all">Filter: All Categories</Option>
+            {categories.map((cat) => (
+              <Option key={cat._id} value={cat.name}>
+                {cat.name}
+              </Option>
+            ))}
+          </Select>
+        </div>
+
+        <Table
+          dataSource={displayedItems}
+          columns={[
+            { title: "Name", dataIndex: "name" },
+            { title: "Category", dataIndex: "category" },
+            { title: "Price", dataIndex: "price" },
+            { title: "Stock", dataIndex: "stock" },
+            {
+              title: "Action",
+              render: (_, record) => (
+                <>
+                  <Button onClick={() => handleEdit(record)}>Edit</Button>
+                  <Button type="danger" onClick={() => handleDelete(record._id)}>
+                    Delete
+                  </Button>
+                </>
+              ),
+            },
+          ]}
+          rowKey="_id"
+        />
+      </div>
     </div>
   );
 };

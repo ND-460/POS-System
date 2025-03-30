@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Input, message } from "antd";
+import { Table, Button, Input, message, Select } from "antd";
 import axios from "axios";
+
+const { Option } = Select;
 
 const AdminManageCategories = () => {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState("");
   const [editingCategory, setEditingCategory] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
+  const [sortOption, setSortOption] = useState("name-asc");
 
   useEffect(() => {
     loadCategories();
@@ -69,9 +72,31 @@ const AdminManageCategories = () => {
     }
   };
 
+  // Handle Sorting
+  const handleSort = (value) => {
+    setSortOption(value);
+    let sortedCategories = [...categories];
+
+    if (value === "name-asc") {
+      sortedCategories.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (value === "name-desc") {
+      sortedCategories.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
+    setCategories(sortedCategories);
+  };
+
   return (
     <div>
       <h2>Manage Categories</h2>
+
+      {/* Sorting Options */}
+      <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+        <Select value={sortOption} onChange={handleSort} style={{ width: 200 }}>
+          <Option value="name-asc">Sort: Name (A-Z)</Option>
+          <Option value="name-desc">Sort: Name (Z-A)</Option>
+        </Select>
+      </div>
 
       {/* Add Category Section */}
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>

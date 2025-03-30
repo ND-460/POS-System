@@ -10,6 +10,7 @@ const AdminManageCashiers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCashier, setEditingCashier] = useState(null);
   const [form] = Form.useForm();
+  const [sortOption, setSortOption] = useState("name-asc");
 
   useEffect(() => {
     loadCashiers();
@@ -19,8 +20,10 @@ const AdminManageCashiers = () => {
   const loadCashiers = async () => {
     try {
       const { data } = await axios.get("http://localhost:8080/api/users/cashiers");
+      console.log("- Cashiers Loaded:", data); // Log fetched data
       setCashiers(data);
     } catch (error) {
+      console.error("- Failed to load cashiers:", error.response?.data || error.message); // Log error details
       message.error("Failed to load cashiers");
     }
   };
@@ -40,13 +43,13 @@ const AdminManageCashiers = () => {
   
   const handleEdit = (cashier) => {
     console.log("-Editing Cashier:", cashier);
-    setIsModalOpen(true);
     setEditingCashier(cashier._id);
+    setIsModalOpen(true);
   
     setTimeout(() => {
       form.setFieldsValue(cashier);
       console.log("-Form Fields Set:", cashier); // -Check if form values update
-    }, 0);
+    }, 100);
   };
   
 
@@ -64,7 +67,7 @@ const AdminManageCashiers = () => {
       } else {
         const { data } = await axios.post("http://localhost:8080/api/users/register", {
           ...values,
-          role: "cashier",
+          role: "cashier", // Ensure role is set to cashier
         });
         message.success("Cashier added successfully!");
         setCashiers((prevCashiers) => [...prevCashiers, data]);
@@ -72,6 +75,7 @@ const AdminManageCashiers = () => {
 
       setIsModalOpen(false);
       setEditingCashier(null);
+      loadCashiers();
       form.resetFields();
     } catch (error) {
       message.error(error.response?.data?.message || "Error saving cashier");
@@ -91,12 +95,36 @@ const AdminManageCashiers = () => {
       message.error(error.response?.data?.message || "Error deleting cashier");
     }
   };
-  
+
+  // Handle Sorting
+  const handleSort = (value) => {
+    setSortOption(value);
+    let sortedCashiers = [...cashiers];
+
+    if (value === "name-asc") {
+      sortedCashiers.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (value === "name-desc") {
+      sortedCashiers.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
+    setCashiers(sortedCashiers);
+  };
 
   return (
     <div>
       <h2>Manage Cashiers</h2>
-      <Button type="primary" onClick={handleAddCashier}>Add Cashier</Button>
+      
+      <Button type="primary" onClick={handleAddCashier} style={{ marginBottom: "20px" }}>
+        Add Cashier
+      </Button>
+      
+      {/* Sorting Options */}
+      <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+        <Select value={sortOption} onChange={handleSort} style={{ width: 200 }}>
+          <Option value="name-asc">Sort: Name (A-Z)</Option>
+          <Option value="name-desc">Sort: Name (Z-A)</Option>
+        </Select>
+      </div>
 
       <Table
         dataSource={cashiers}
