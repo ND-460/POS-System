@@ -54,12 +54,12 @@ const ReceiptPage = () => {
       <h2 className="receipt-header">🧾 Receipt</h2>
 
       <div className="receipt-info">
-        <span><strong>Bill ID:</strong> {bill._id}</span>
-        <span><strong>Date:</strong> {new Date(bill.createdAt).toLocaleString()}</span>
+        <span><strong>Bill ID:</strong> {bill?._id || "N/A"}</span>
+        <span><strong>Date:</strong> {bill?.createdAt ? new Date(bill.createdAt).toLocaleString() : "N/A"}</span>
       </div>
       <div className="receipt-info">
-        <span><strong>Cashier:</strong> {bill.cashier.name}</span>
-        <span><strong>Customer:</strong> {bill.customerName || "Guest"}</span>
+        <span><strong>Cashier:</strong> {bill?.cashierName || "Unknown"}</span> {/* Use cashierName */}
+        <span><strong>Customer:</strong> {bill?.customerName || "Guest"}</span>
       </div>
 
       <table className="receipt-table">
@@ -71,20 +71,20 @@ const ReceiptPage = () => {
           </tr>
         </thead>
         <tbody>
-          {bill.items.map((item, index) => (
+          {bill?.items?.map((item, index) => (
             <tr key={index}>
-              <td>{item.item.name}</td>
-              <td>{item.quantity}</td>
-              <td>${item.price.toFixed(2)}</td>
+              <td>{item?.itemName || "Unknown Item"}</td> {/* Use itemName */}
+              <td>{item?.quantity || 0}</td>
+              <td>${item?.price?.toFixed(2) || "0.00"}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
       <div className="total-section">
-        <strong>Total: ${bill.totalAmount.toFixed(2)}</strong>
+        <strong>Total: ${bill?.totalAmount?.toFixed(2) || "0.00"}</strong>
       </div>
-      <p><strong>Payment Method:</strong> {bill.paymentMethod}</p>
+      <p><strong>Payment Method:</strong> {bill?.paymentMethod || "N/A"}</p>
 
       <div className="button-container">
         <Button type="primary" onClick={() => window.print()}>🖨 Print Again</Button>

@@ -10,6 +10,7 @@ const AdminManageCategories = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
   const [sortOption, setSortOption] = useState("name-asc");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadCategories();
@@ -86,6 +87,11 @@ const AdminManageCategories = () => {
     setCategories(sortedCategories);
   };
 
+  // Filtered Categories
+  const filteredCategories = categories.filter((category) =>
+    category.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div>
       <h2>Manage Categories</h2>
@@ -96,6 +102,12 @@ const AdminManageCategories = () => {
           <Option value="name-asc">Sort: Name (A-Z)</Option>
           <Option value="name-desc">Sort: Name (Z-A)</Option>
         </Select>
+        <Input
+          placeholder="Search Categories"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ width: 200 }}
+        />
       </div>
 
       {/* Add Category Section */}
@@ -112,7 +124,7 @@ const AdminManageCategories = () => {
 
       {/* Categories Table */}
       <Table
-        dataSource={categories}
+        dataSource={filteredCategories}
         columns={[
           { title: "Category Name", dataIndex: "name" },
           {

@@ -54,19 +54,7 @@ const DefaultLayout = ({ children }) => {
           <Menu.Item key="/" icon={<HomeOutlined />} onClick={handleHomeNavigation}>
             Home
           </Menu.Item>
-          {/* {user?.role === "admin" && (
-            <Menu.Item key="/admin" icon={<UnorderedListOutlined />} onClick={() => navigate("/admin")}>
-              Admin Dashboard
-            </Menu.Item>
-          )}
-          {user?.role === "cashier" && (
-            <Menu.Item key="/cashier" icon={<CopyOutlined />} onClick={() => navigate("/cashier")}>
-              Cashier Transactions
-            </Menu.Item>
-          )} */}
-          {/* <Menu.Item key="/customers" icon={<UserOutlined />} onClick={() => navigate("/customers")}>
-            Customers
-          </Menu.Item> */}
+          
           <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Logout
           </Menu.Item>

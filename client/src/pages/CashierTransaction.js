@@ -99,17 +99,32 @@ const CashierTransaction = () => {
       return;
     }
 
+    // Validate quantities in the cart
+    for (const item of cart) {
+      if (isNaN(item.quantity) || item.quantity <= 0) {
+        message.error(`Invalid quantity for item: ${item.name}`);
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
       const cashier = JSON.parse(localStorage.getItem("auth"))?.user?._id;
+      const cashierName = JSON.parse(localStorage.getItem("auth"))?.user?.name || "Unknown"; // Add cashier name
       const selectedCustomer = customersList.find((cust) => cust._id === customer);
 
       const transaction = {
         customer: customer || null, // Save customer ID if selected
-        customerName: selectedCustomer ? selectedCustomer.name : "Guest", // -Save customer name
+        customerName: selectedCustomer ? selectedCustomer.name : "Guest", // Save customer name
         cashier,
-        items: cart.map(({ _id, quantity, price }) => ({ item: _id, quantity, price })),
+        cashierName, // Include cashier name
+        items: cart.map(({ _id, name, quantity, price }) => ({
+          item: _id,
+          itemName: name, // Include item name
+          quantity,
+          price,
+        })),
         totalAmount: total,
         taxAmount: 0,
         paymentMethod,

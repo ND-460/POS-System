@@ -11,6 +11,7 @@ const AdminManageCashiers = () => {
   const [editingCashier, setEditingCashier] = useState(null);
   const [form] = Form.useForm();
   const [sortOption, setSortOption] = useState("name-asc");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadCashiers();
@@ -110,6 +111,14 @@ const AdminManageCashiers = () => {
     setCashiers(sortedCashiers);
   };
 
+  // Filtered Cashiers
+  const filteredCashiers = cashiers.filter(
+    (cashier) =>
+      cashier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cashier.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cashier.mobile.includes(searchTerm)
+  );
+
   return (
     <div>
       <h2>Manage Cashiers</h2>
@@ -118,16 +127,22 @@ const AdminManageCashiers = () => {
         Add Cashier
       </Button>
       
-      {/* Sorting Options */}
+      {/* Sorting and Search Options */}
       <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
         <Select value={sortOption} onChange={handleSort} style={{ width: 200 }}>
           <Option value="name-asc">Sort: Name (A-Z)</Option>
           <Option value="name-desc">Sort: Name (Z-A)</Option>
         </Select>
+        <Input
+          placeholder="Search Cashiers"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ width: 200 }}
+        />
       </div>
 
       <Table
-        dataSource={cashiers}
+        dataSource={filteredCashiers}
         columns={[
           { title: "Name", dataIndex: "name" },
           { title: "Email", dataIndex: "email" },

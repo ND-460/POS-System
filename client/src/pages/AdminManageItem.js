@@ -11,6 +11,7 @@ const AdminManageItems = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [sortOption, setSortOption] = useState("name-asc");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadItems();
@@ -116,9 +117,13 @@ const AdminManageItems = () => {
   };
 
   // Filtered and Sorted Items
-  const displayedItems = items.filter(
-    (item) => categoryFilter === "all" || item.category === categoryFilter
-  );
+  const displayedItems = items
+    .filter(
+      (item) =>
+        (categoryFilter === "all" || item.category === categoryFilter) &&
+        (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.barcode.includes(searchTerm))
+    );
 
   return (
     <div>
@@ -175,12 +180,7 @@ const AdminManageItems = () => {
             <Option value="price-asc">Sort: Price (Low to High)</Option>
             <Option value="price-desc">Sort: Price (High to Low)</Option>
           </Select>
-
-          <Select
-            value={categoryFilter}
-            onChange={handleFilter}
-            style={{ width: 200 }}
-          >
+          <Select value={categoryFilter} onChange={handleFilter} style={{ width: 200 }}>
             <Option value="all">Filter: All Categories</Option>
             {categories.map((cat) => (
               <Option key={cat._id} value={cat.name}>
@@ -188,6 +188,12 @@ const AdminManageItems = () => {
               </Option>
             ))}
           </Select>
+          <Input
+            placeholder="Search Items"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ width: 200 }}
+          />
         </div>
 
         <Table

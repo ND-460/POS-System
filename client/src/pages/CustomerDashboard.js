@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Select, Card, message } from "antd";
+import { Table, Select, Card, message, Input } from "antd";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import DefaultLayout from "../components/DefaultLayout";
@@ -11,6 +11,7 @@ const CustomerDashboard = () => {
   const [loyaltyPoints, setLoyaltyPoints] = useState(0);
   const [sortOption, setSortOption] = useState("newest");
   const [paymentFilter, setPaymentFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const customerId = JSON.parse(localStorage.getItem("auth"))?.user?._id; // Get logged-in user ID
 
@@ -93,9 +94,13 @@ const CustomerDashboard = () => {
   };
 
   // -Filtered and Sorted Orders
-  const displayedOrders = orders.filter(
-    (order) => paymentFilter === "all" || order.paymentMethod === paymentFilter
-  );
+  const displayedOrders = orders
+    .filter(
+      (order) =>
+        (paymentFilter === "all" || order.paymentMethod === paymentFilter) &&
+        (order.paymentMethod.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          order._id.includes(searchTerm))
+    );
 
   return (
     <DefaultLayout>
@@ -126,6 +131,13 @@ const CustomerDashboard = () => {
           <Option value="loyalty points">Loyalty Points</Option>
           <Option value="UPI">UPI</Option>
         </Select>
+
+        <Input
+          placeholder="Search Orders"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ width: 200 }}
+        />
       </div>
 
       {/* Orders Table */}
