@@ -111,19 +111,21 @@ const CashierTransaction = () => {
 
     try {
       const cashier = JSON.parse(localStorage.getItem("auth"))?.user?._id;
-      const cashierName = JSON.parse(localStorage.getItem("auth"))?.user?.name || "Unknown"; // Add cashier name
+      const cashierName = JSON.parse(localStorage.getItem("auth"))?.user?.name || "Unknown";
       const selectedCustomer = customersList.find((cust) => cust._id === customer);
 
       const transaction = {
-        customer: customer || null, // Save customer ID if selected
-        customerName: selectedCustomer ? selectedCustomer.name : "Guest", // Save customer name
+        customer: customer || null,
+        customerName: selectedCustomer ? selectedCustomer.name : "Guest",
         cashier,
-        cashierName, // Include cashier name
-        items: cart.map(({ _id, name, quantity, price }) => ({
+        cashierName,
+        items: cart.map(({ _id, name, quantity, price, discount, loyaltyPoints }) => ({
           item: _id,
-          itemName: name, // Include item name
+          itemName: name,
           quantity,
           price,
+          discount,
+          loyaltyPoints, // Include loyalty points
         })),
         totalAmount: total,
         taxAmount: 0,
@@ -140,7 +142,7 @@ const CashierTransaction = () => {
         localStorage.removeItem("cart");
 
         console.log(`🔄 Fetching receipt for Bill ID: ${response.data.bill._id}`);
-        await fetchReceipt(response.data.bill._id); // Redirect to receipt
+        await fetchReceipt(response.data.bill._id);
       } else {
         message.error("Transaction completed, but receipt not found.");
       }
@@ -211,7 +213,7 @@ const CashierTransaction = () => {
       <h3>Total: ${total.toFixed(2)}</h3>
       <Select value={paymentMethod} onChange={setPaymentMethod} style={{ marginBottom: "10px" }}>
         <Option value="cash">Cash</Option>
-        <Option value="cheque">Cheque</Option>
+        {/* <Option value="cheque">Cheque</Option> */}
         <Option value="loyalty points">Loyalty Points</Option>
         <Option value="UPI">UPI</Option>
       </Select>

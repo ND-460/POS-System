@@ -14,7 +14,7 @@ exports.completeTransaction = async (req, res) => {
     }
 
     if (!customer || customer === "guest") {
-      customer = null; // -Allow guest transactions
+      customer = null; // Allow guest transactions
     }
 
     if (!taxAmount) {
@@ -27,6 +27,9 @@ exports.completeTransaction = async (req, res) => {
 
     // Prepare items with itemName
     const itemsWithNames = [];
+    let totalLoyaltyPoints = 0;
+    let discountedTotalAmount = 0;
+
     for (const transactionItem of items) {
       const item = await Item.findById(transactionItem.item);
       if (!item) {
@@ -45,32 +48,63 @@ exports.completeTransaction = async (req, res) => {
       item.stock -= transactionItem.quantity; // Subtract quantity from stock
       await item.save();
 
+      const originalPrice = item.price * transactionItem.quantity; // Calculate original price
+      const discountedPrice = originalPrice * (item.discount || 0) / 100; // Calculate discounted price
+      const subtotal = originalPrice - discountedPrice; // Calculate subtotal
+      const itemLoyaltyPoints = item.loyaltyPoints * transactionItem.quantity;
+
+      discountedTotalAmount += subtotal; // Add subtotal to total amount
+      totalLoyaltyPoints += itemLoyaltyPoints;
+
       itemsWithNames.push({
         item: transactionItem.item,
-        itemName: item.name, // Store item name
+        itemName: item.name,
         quantity: transactionItem.quantity,
-        price: transactionItem.price,
+        price: item.price,
+        originalPrice,
+        discountedPrice,
+        subtotal,
+        loyaltyPoints: itemLoyaltyPoints,
       });
     }
 
-    // -Fetch customer name if exists
-    let customerName = "Guest";
+    // Handle payment with loyalty points
+    let remainingAmount = discountedTotalAmount;
+    let loyaltyPointsUsed = 0;
+
     if (customer) {
-      const customerData = await User.findById(customer).select("name");
+      const customerData = await User.findById(customer).select("name loyaltyPoints");
       if (customerData) {
-        customerName = customerData.name;
+        if (paymentMethod === "loyalty points") {
+          if (customerData.loyaltyPoints >= remainingAmount) {
+            loyaltyPointsUsed = remainingAmount;
+            customerData.loyaltyPoints -= remainingAmount;
+            remainingAmount = 0;
+          } else {
+            loyaltyPointsUsed = customerData.loyaltyPoints;
+            remainingAmount -= customerData.loyaltyPoints;
+            customerData.loyaltyPoints = 0;
+          }
+        }
+
+        if (remainingAmount > 0) {
+          customerData.loyaltyPoints += Math.floor(totalLoyaltyPoints); // Add earned loyalty points
+        }
+
+        await customerData.save();
       }
     }
 
-    // -Create new bill
+    // Create new bill
     const bill = new Bill({
       customer,
       cashier,
-      cashierName, // Store cashier name
+      cashierName,
       items: itemsWithNames,
-      totalAmount,
-      paymentMethod,
+      totalAmount: discountedTotalAmount,
+      paymentMethod: remainingAmount > 0 ? "mixed" : "loyalty points", // Mixed payment if loyalty points are insufficient
       taxAmount,
+      loyaltyPointsUsed,
     });
     await bill.save();
 
@@ -81,12 +115,13 @@ exports.completeTransaction = async (req, res) => {
       bill: {
         _id: bill._id,
         createdAt: bill.createdAt,
-        customerName, // -Ensure customer name is included in response
+        customerName: customer ? customerData.name : "Guest",
         cashier,
-        cashierName, // Include cashier name
+        cashierName,
         items: itemsWithNames,
-        totalAmount,
-        paymentMethod,
+        totalAmount: discountedTotalAmount,
+        paymentMethod: remainingAmount > 0 ? "mixed" : "loyalty points",
+        loyaltyPointsUsed,
       },
     });
   } catch (error) {

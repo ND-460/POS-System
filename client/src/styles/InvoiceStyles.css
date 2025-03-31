@@ -1,5 +1,5 @@
 .receipt-container {
-  width: 320px;
+  width: 480px; /* Increased width */
   margin: auto;
   padding: 15px;
   background: #fff;
@@ -39,6 +39,7 @@
   padding: 8px;
   text-align: left;
   border-bottom: 1px solid #ddd;
+  font-size: 14px; /* Adjust font size for better readability */
 }
 
 .total-section {

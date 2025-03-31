@@ -67,24 +67,38 @@ const ReceiptPage = () => {
           <tr>
             <th>Item</th>
             <th>Qty</th>
-            <th>Price</th>
+            <th>Original Price</th>
+            <th>Discounted Price</th>
+            <th>Subtotal</th>
+            <th>Loyalty Points</th>
           </tr>
         </thead>
         <tbody>
           {bill?.items?.map((item, index) => (
             <tr key={index}>
-              <td>{item?.itemName || "Unknown Item"}</td> {/* Use itemName */}
+              <td>{item?.itemName || "Unknown Item"}</td>
               <td>{item?.quantity || 0}</td>
-              <td>${item?.price?.toFixed(2) || "0.00"}</td>
+              <td>${(item?.originalPrice || 0).toFixed(2)}</td> {/* Display original price */}
+              <td>${(item?.discountedPrice || 0).toFixed(2)}</td> {/* Display discounted price */}
+              <td>${(item?.subtotal || 0).toFixed(2)}</td> {/* Display subtotal */}
+              <td>{item?.loyaltyPoints || 0} pts</td>
             </tr>
           ))}
         </tbody>
       </table>
 
       <div className="total-section">
-        <strong>Total: ${bill?.totalAmount?.toFixed(2) || "0.00"}</strong>
+        <strong>Total: ${bill?.totalAmount?.toFixed(2) || "0.00"}</strong> {/* Display correct total */}
       </div>
       <p><strong>Payment Method:</strong> {bill?.paymentMethod || "N/A"}</p>
+      <p>
+        <strong>Loyalty Points Earned:</strong>{" "}
+        {bill?.items?.reduce((sum, item) => sum + (item?.loyaltyPoints || 0), 0)} pts
+      </p> {/* Calculate total loyalty points */}
+      <p>
+        <strong>Loyalty Points Used:</strong>{" "}
+        {bill?.paymentMethod === "loyalty points" ? bill?.totalAmount : 0}
+      </p>
 
       <div className="button-container">
         <Button type="primary" onClick={() => window.print()}>🖨 Print Again</Button>

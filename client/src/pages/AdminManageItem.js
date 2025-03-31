@@ -165,6 +165,10 @@ const AdminManageItems = () => {
             <InputNumber min={0} max={100} />
           </Form.Item>
 
+          <Form.Item name="loyaltyPoints" label="Loyalty Points" rules={[{ required: true, type: "number", min: 0 }]}>
+            <InputNumber />
+          </Form.Item>
+
           <Button type="primary" htmlType="submit">
             {editingItem ? "Update Item" : "Add Item"}
           </Button>
@@ -203,6 +207,7 @@ const AdminManageItems = () => {
             { title: "Category", dataIndex: "category" },
             { title: "Price", dataIndex: "price" },
             { title: "Stock", dataIndex: "stock" },
+            { title: "Loyalty Points", dataIndex: "loyaltyPoints" }, // Ensure loyalty points are displayed
             {
               title: "Action",
               render: (_, record) => (
