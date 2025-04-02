@@ -20,7 +20,11 @@ const billSchema = new mongoose.Schema(
     ],
     totalAmount: { type: Number, required: true },
     taxAmount: { type: Number, default: 0 },
-    paymentMethod: { type: String, enum: ["cash", "cheque", "loyalty points", "UPI"], required: true },
+    paymentMethod: { 
+      type: String, 
+      enum: ["cash", "cheque", "loyalty points", "UPI"], // Removed "mixed"
+      required: true 
+    },
     loyaltyPointsUsed: { type: Number, default: 0 }, // Track loyalty points used
   },
   { timestamps: true }

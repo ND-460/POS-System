@@ -25,6 +25,12 @@ exports.completeTransaction = async (req, res) => {
     const cashierData = await User.findById(cashier).select("name");
     const cashierName = cashierData ? cashierData.name : "Unknown";
 
+    // Fetch customer data (if applicable)
+    let customerData = null;
+    if (customer) {
+      customerData = await User.findById(customer).select("name loyaltyPoints");
+    }
+
     // Prepare items with itemName
     const itemsWithNames = [];
     let totalLoyaltyPoints = 0;
@@ -72,27 +78,39 @@ exports.completeTransaction = async (req, res) => {
     let remainingAmount = discountedTotalAmount;
     let loyaltyPointsUsed = 0;
 
-    if (customer) {
-      const customerData = await User.findById(customer).select("name loyaltyPoints");
+    if (paymentMethod === "loyalty points") {
       if (customerData) {
-        if (paymentMethod === "loyalty points") {
-          if (customerData.loyaltyPoints >= remainingAmount) {
-            loyaltyPointsUsed = remainingAmount;
-            customerData.loyaltyPoints -= remainingAmount;
-            remainingAmount = 0;
-          } else {
-            loyaltyPointsUsed = customerData.loyaltyPoints;
-            remainingAmount -= customerData.loyaltyPoints;
-            customerData.loyaltyPoints = 0;
-          }
+        if (customerData.loyaltyPoints >= discountedTotalAmount) {
+          loyaltyPointsUsed = discountedTotalAmount;
+          customerData.loyaltyPoints -= discountedTotalAmount;
+          remainingAmount = 0;
+          await customerData.save();
+        } else {
+          return res.status(400).json({
+            message: "Loyalty points are not adequate, try another payment method.",
+          });
         }
-
-        if (remainingAmount > 0) {
-          customerData.loyaltyPoints += Math.floor(totalLoyaltyPoints); // Add earned loyalty points
-        }
-
-        await customerData.save();
+      } else {
+        return res.status(400).json({ message: "Loyalty points payment requires a registered customer." });
       }
+    } else if (paymentMethod === "cash" || paymentMethod === "UPI" || paymentMethod === "cheque") {
+      // Handle valid payment methods
+      remainingAmount = 0; // Assume full payment is made
+    } else {
+      return res.status(400).json({ message: "Invalid payment method. Please choose a valid payment method." });
+    }
+
+    // Remove logic for "mixed" payment method
+    if (remainingAmount > 0) {
+      return res.status(400).json({
+        message: "Payment could not be completed. Please choose another payment method.",
+      });
+    }
+
+    // Add loyalty points for the customer if applicable
+    if (customerData) {
+      customerData.loyaltyPoints += Math.floor(totalLoyaltyPoints);
+      await customerData.save();
     }
 
     // Create new bill
@@ -102,7 +120,7 @@ exports.completeTransaction = async (req, res) => {
       cashierName,
       items: itemsWithNames,
       totalAmount: discountedTotalAmount,
-      paymentMethod: remainingAmount > 0 ? "mixed" : "loyalty points", // Mixed payment if loyalty points are insufficient
+      paymentMethod, // Use the valid payment method provided
       taxAmount,
       loyaltyPointsUsed,
     });
@@ -115,12 +133,12 @@ exports.completeTransaction = async (req, res) => {
       bill: {
         _id: bill._id,
         createdAt: bill.createdAt,
-        customerName: customer ? customerData.name : "Guest",
+        customerName: customerData ? customerData.name : "Guest",
         cashier,
         cashierName,
         items: itemsWithNames,
         totalAmount: discountedTotalAmount,
-        paymentMethod: remainingAmount > 0 ? "mixed" : "loyalty points",
+        paymentMethod,
         loyaltyPointsUsed,
       },
     });
