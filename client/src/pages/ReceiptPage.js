@@ -12,6 +12,11 @@ const ReceiptPage = () => {
 
   useEffect(() => {
     const fetchBill = async () => {
+      if (!billId) {
+        message.error("Invalid bill ID. Unable to fetch receipt.");
+        return;
+      }
+
       try {
         console.log(`-Fetching bill with ID: ${billId}`);
         const { data } = await axios.get(`http://localhost:8080/api/bills/${billId}`);
@@ -31,7 +36,7 @@ const ReceiptPage = () => {
         setBill(data);
       } catch (error) {
         console.error("- Error fetching bill:", error);
-        message.error("Error fetching receipt.");
+        message.error("Error fetching receipt. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -41,11 +46,21 @@ const ReceiptPage = () => {
   }, [billId]);
 
   useEffect(() => {
-    if (bill) {
+    if (bill && bill._id !== "N/A" && bill.items?.length > 0) {
       console.log("🖨 Printing Receipt...");
       setTimeout(() => window.print(), 1000);
+    } else if (bill && bill._id === "N/A") {
+      message.warning("Receipt data is incomplete. Unable to print.");
     }
   }, [bill]);
+
+  // Add a function to explicitly trigger receipt generation after transaction completion
+  const handleTransactionComplete = (billId) => {
+    message.success("Transaction completed!");
+    setTimeout(() => {
+      navigate(`/receipt/${billId}`); // Redirect to the receipt page
+    }, 500); // Delay to ensure the message is visible
+  };
 
   if (loading) return <Spin size="large" className="loading-spinner" />;
 

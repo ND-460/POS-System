@@ -4,52 +4,72 @@ import {
   AppstoreOutlined,
   UnorderedListOutlined,
   UserOutlined,
+  LogoutOutlined,
+  HomeOutlined,
 } from "@ant-design/icons";
 import AdminManageItems from "./AdminManageItem";
 import AdminManageCategories from "./AdminManageCategories";
 import AdminManageCashiers from "./AdminManageCashiers";
-import DefaultLayout from "../components/DefaultLayout";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 const { Header, Sider, Content } = Layout;
 
 const AdminDashboard = () => {
   const [selectedSection, setSelectedSection] = useState("items");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT_USER" });
+    localStorage.removeItem("auth");
+    navigate("/login");
+  };
+
+  const handleHomeNavigation = () => {
+    navigate("/admin");
+  };
 
   return (
-    <DefaultLayout>
-      <Layout>
-        <Sider collapsible>
-          <div className="logo">Admin Panel</div>
-          <Menu
-            theme="dark"
-            mode="inline"
-            defaultSelectedKeys={["items"]}
-            onClick={({ key }) => setSelectedSection(key)}
-          >
-            <Menu.Item key="items" icon={<UnorderedListOutlined />}>
-              Manage Items
-            </Menu.Item>
-            <Menu.Item key="categories" icon={<AppstoreOutlined />}>
-              Manage Categories
-            </Menu.Item>
-            <Menu.Item key="cashiers" icon={<UserOutlined />}>
-              Manage Cashiers
-            </Menu.Item>
-          </Menu>
-        </Sider>
+    <Layout>
+      <Sider collapsible>
+        <div className="logo">Admin Panel</div>
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={["items"]}
+          onClick={({ key }) => setSelectedSection(key)}
+        >
+          <Menu.Item key="home" icon={<HomeOutlined />} onClick={handleHomeNavigation}>
+            Home
+          </Menu.Item>
+          <Menu.Item key="items" icon={<UnorderedListOutlined />}>
+            Manage Items
+          </Menu.Item>
+          <Menu.Item key="categories" icon={<AppstoreOutlined />}>
+            Manage Categories
+          </Menu.Item>
+          <Menu.Item key="cashiers" icon={<UserOutlined />}>
+            Manage Cashiers
+          </Menu.Item>
+          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+            Logout
+          </Menu.Item>
+        </Menu>
+      </Sider>
 
-        <Layout>
-          <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
-            <h2>Admin Dashboard</h2>
-          </Header>
-          <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
-            {selectedSection === "items" && <AdminManageItems />}
-            {selectedSection === "categories" && <AdminManageCategories />}
-            {selectedSection === "cashiers" && <AdminManageCashiers />}
-          </Content>
-        </Layout>
+      <Layout>
+        <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
+          <h2>Welcome, {user?.name || "Admin"}</h2>
+        </Header>
+        <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
+          {selectedSection === "items" && <AdminManageItems />}
+          {selectedSection === "categories" && <AdminManageCategories />}
+          {selectedSection === "cashiers" && <AdminManageCashiers />}
+        </Content>
       </Layout>
-    </DefaultLayout>
+    </Layout>
   );
 };
 

@@ -94,13 +94,11 @@ exports.completeTransaction = async (req, res) => {
         return res.status(400).json({ message: "Loyalty points payment requires a registered customer." });
       }
     } else if (paymentMethod === "cash" || paymentMethod === "UPI" || paymentMethod === "cheque") {
-      // Handle valid payment methods
       remainingAmount = 0; // Assume full payment is made
     } else {
       return res.status(400).json({ message: "Invalid payment method. Please choose a valid payment method." });
     }
 
-    // Remove logic for "mixed" payment method
     if (remainingAmount > 0) {
       return res.status(400).json({
         message: "Payment could not be completed. Please choose another payment method.",
@@ -120,7 +118,7 @@ exports.completeTransaction = async (req, res) => {
       cashierName,
       items: itemsWithNames,
       totalAmount: discountedTotalAmount,
-      paymentMethod, // Use the valid payment method provided
+      paymentMethod,
       taxAmount,
       loyaltyPointsUsed,
     });
@@ -130,6 +128,7 @@ exports.completeTransaction = async (req, res) => {
 
     return res.status(201).json({
       message: "Transaction completed successfully!",
+      billId: bill._id, // Ensure billId is included in the response
       bill: {
         _id: bill._id,
         createdAt: bill.createdAt,

@@ -31,8 +31,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-
 router.post("/complete", completeTransaction);
+
 router.get("/:billId", async (req, res) => {
   try {
     console.log(`-Fetching Bill ID: ${req.params.billId}`);
@@ -53,8 +53,5 @@ router.get("/:billId", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch bill" });
   }
 });
-
-
-
 
 module.exports = router;
