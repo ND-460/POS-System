@@ -29,6 +29,7 @@ app.use(morgan("dev"));
 
 app.use(cors(corsOptions));
 const categoryRoutes = require("./routes/categoryRoutes");
+const reportsRoute = require("./routes/reportsRoute");
 
 // Session Middleware
 app.use(
@@ -44,6 +45,7 @@ app.use(passport.session());
 
 
 app.use("/api/categories", categoryRoutes);
+app.use("/api/reports", reportsRoute);
 
 
 //routes

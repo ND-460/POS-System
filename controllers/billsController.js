@@ -13,9 +13,9 @@ exports.completeTransaction = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    if (!customer || customer === "guest") {
-      customer = null; // Allow guest transactions
-    }
+    // if (!customer || customer === "guest") {
+    //   customer = null; // Allow guest transactions
+    // }
 
     if (!taxAmount) {
       taxAmount = 0;

@@ -10,6 +10,7 @@ import {
 import AdminManageItems from "./AdminManageItem";
 import AdminManageCategories from "./AdminManageCategories";
 import AdminManageCashiers from "./AdminManageCashiers";
+import AdminReports from "./AdminReports";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -28,7 +29,13 @@ const AdminDashboard = () => {
   };
 
   const handleHomeNavigation = () => {
-    navigate("/admin");
+    if (user?.role === "admin") {
+      setSelectedSection("items"); // Default section for admin
+    } else if (user?.role === "cashier") {
+      navigate("/cashier"); // Redirect to cashier dashboard
+    } else {
+      navigate("/login"); // Redirect to login if role is undefined
+    }
   };
 
   return (
@@ -39,9 +46,15 @@ const AdminDashboard = () => {
           theme="dark"
           mode="inline"
           defaultSelectedKeys={["items"]}
-          onClick={({ key }) => setSelectedSection(key)}
+          onClick={({ key }) => {
+            if (key === "home") {
+              handleHomeNavigation();
+            } else {
+              setSelectedSection(key);
+            }
+          }}
         >
-          <Menu.Item key="home" icon={<HomeOutlined />} onClick={handleHomeNavigation}>
+          <Menu.Item key="home" icon={<HomeOutlined />}>
             Home
           </Menu.Item>
           <Menu.Item key="items" icon={<UnorderedListOutlined />}>
@@ -52,6 +65,9 @@ const AdminDashboard = () => {
           </Menu.Item>
           <Menu.Item key="cashiers" icon={<UserOutlined />}>
             Manage Cashiers
+          </Menu.Item>
+          <Menu.Item key="reports" icon={<AppstoreOutlined />}>
+            Reports
           </Menu.Item>
           <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Logout
@@ -67,6 +83,7 @@ const AdminDashboard = () => {
           {selectedSection === "items" && <AdminManageItems />}
           {selectedSection === "categories" && <AdminManageCategories />}
           {selectedSection === "cashiers" && <AdminManageCashiers />}
+          {selectedSection === "reports" && <AdminReports />}
         </Content>
       </Layout>
     </Layout>

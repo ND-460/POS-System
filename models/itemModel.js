@@ -11,6 +11,7 @@ const itemSchema = new mongoose.Schema(
     discount: { type: Number, default: 0 }, // Discount in percentage
     lowStockAlert: { type: Number, default: 5 }, // Alert when stock falls below this
     loyaltyPoints: { type: Number, default: 0 }, // Points earned per item
+    inventoryUpdated: { type: Date, default: null }, // Ensure default is explicitly set to null
   },
   { timestamps: true }
 );

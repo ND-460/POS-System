@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Item = require("../models/itemModel");
-const {editItemController,deleteItemController} = require("../controllers/itemController")
+const {editItemController,deleteItemController, updateInventoryController} = require("../controllers/itemController")
 
 router.get("/barcode/:barcode", async (req, res) => {
   try {
@@ -49,8 +49,7 @@ router.delete("/:id", deleteItemController);
 // - Update an item by ID
 router.put("/:id", editItemController);
 
-
-
-
+// - Update inventory for an item by ID
+router.put("/:id/inventory", updateInventoryController);
 
 module.exports = router;
