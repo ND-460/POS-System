@@ -54,9 +54,9 @@ const AdminDashboard = () => {
             }
           }}
         >
-          <Menu.Item key="home" icon={<HomeOutlined />}>
+          {/* <Menu.Item key="home" icon={<HomeOutlined />}>
             Home
-          </Menu.Item>
+          </Menu.Item> */}
           <Menu.Item key="items" icon={<UnorderedListOutlined />}>
             Manage Items
           </Menu.Item>

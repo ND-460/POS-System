@@ -1,5 +1,4 @@
 const itemModel = require("../models/itemModel");
-
 // get items
 const getItemController = async (req, res) => {
   try {
@@ -9,7 +8,6 @@ const getItemController = async (req, res) => {
     console.log(error);
   }
 };
-
 //add items
 const addItemController = async (req, res) => {
   try {
@@ -21,7 +19,6 @@ const addItemController = async (req, res) => {
     console.log(error);
   }
 };
-
 //update item
 const editItemController = async (req, res) => {
   try {
@@ -33,7 +30,6 @@ const editItemController = async (req, res) => {
     if (req.body.stock) {
       updatedData.inventoryUpdated = new Date(); // Update inventoryUpdated if stock is modified
     }
-
     const updatedItem = await itemModel.findByIdAndUpdate(id, updatedData, { new: true });
 
     if (!updatedItem) {
@@ -48,7 +44,6 @@ const editItemController = async (req, res) => {
     res.status(500).json({ message: "Error updating item", error });
   }
 };
-
 //delete item
 const deleteItemController = async (req, res) => {
   try {
@@ -70,7 +65,6 @@ const deleteItemController = async (req, res) => {
     res.status(500).json({ message: "Error deleting item", error });
   }
 };
-
 //update inventory
 const updateInventoryController = async (req, res) => {
   try {
@@ -102,7 +96,6 @@ const updateInventoryController = async (req, res) => {
     res.status(500).json({ message: "Error updating inventory", error });
   }
 };
-
 module.exports = {
   getItemController,
   addItemController,

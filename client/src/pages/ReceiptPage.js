@@ -103,7 +103,7 @@ const ReceiptPage = () => {
       </table>
 
       <div className="total-section">
-        <strong>Total: ${bill?.totalAmount?.toFixed(2) || "0.00"}</strong> {/* Display correct total */}
+        <strong>Total: <span>&#8377;</span>{bill?.totalAmount?.toFixed(2) || "0.00"}</strong> {/* Display correct total */}
       </div>
       <p><strong>Payment Method:</strong> {bill?.paymentMethod || "N/A"}</p>
       <p>

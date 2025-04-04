@@ -198,7 +198,7 @@ const CashierTransaction = () => {
             rowKey="_id"
           />
 
-          <h3>Total: ${total.toFixed(2)}</h3>
+          <h3>Total: <span>&#8377;</span>{total.toFixed(2)}</h3>
           <Select value={paymentMethod} onChange={setPaymentMethod} style={{ marginBottom: "10px" }}>
             <Option value="cash">Cash</Option>
             <Option value="loyalty points">Loyalty Points</Option>

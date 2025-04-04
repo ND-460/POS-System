@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Input, message, Form, InputNumber, Select } from "antd";
 import axios from "axios";
+import { Bar } from "react-chartjs-2";
+import Barcode from "react-barcode";
 
 const { Option } = Select;
 
@@ -207,7 +209,19 @@ const AdminManageItems = () => {
             { title: "Category", dataIndex: "category" },
             { title: "Price", dataIndex: "price" },
             { title: "Stock", dataIndex: "stock" },
-            { title: "Loyalty Points", dataIndex: "loyaltyPoints" }, // Ensure loyalty points are displayed
+            { title: "Loyalty Points", dataIndex: "loyaltyPoints" },
+            {
+              title: "Barcode",
+              dataIndex:"barcode",
+              render:(text)=>{
+                return text ? (
+                  <div>
+                    <Barcode value={text} width={1} height={50} fontSize={12} />
+                    {/* <div style={{ marginTop: "5px", fontSize: "12px", textAlign: "center" }}>{text}</div> */}
+                  </div>
+                ) : "N/A";
+              }
+            }, // Ensure loyalty points are displayed
             {
               title: "Action",
               render: (_, record) => (

@@ -5,6 +5,8 @@ import moment from "moment";
 import CategorySalesChart from "../components/CategorySalesChart"; // Import the pie chart component
 import MostSoldItemsChart from "../components/MostSoldItemsChart"; // Import the bar chart component
 import MonthlyRevenueChart from "../components/MonthlyRevenueChart"; // Import the new chart component
+import { render } from "react-dom";
+import Barcode from "react-barcode"; // Import react-barcode
 
 const { RangePicker } = DatePicker;
 
@@ -38,7 +40,12 @@ const AdminReports = () => {
     try {
       setLoading(true);
       const response = await axios.get("/api/reports/inventory");
-      setInventoryReports(response.data);
+      const formattedData = response.data.map((item) => ({
+        ...item,
+        barcode: item.barcode || null, // Ensure barcode is included, set to null if missing
+      }));
+      console.log("Fetched Inventory Reports:", formattedData); // Log the fetched data for debugging
+      setInventoryReports(formattedData);
     } catch (error) {
       console.error("Error fetching inventory reports:", error);
     } finally {
@@ -106,8 +113,22 @@ const AdminReports = () => {
       dataIndex: "inventoryUpdated",
       key: "inventoryUpdated",
       render: (text) => {
-        console.log("Rendering Last Updated:", text); // Log the value being rendered
+        console.log("Rendering Last Updated:", text); 
         return text ? moment(text).format("YYYY-MM-DD HH:mm") : "Never";
+      },
+    },
+    {
+      title: "Barcode",
+      dataIndex: "barcode",
+      key: "barcode",
+      render: (text) => {
+        console.log("Rendering Barcode:", text); 
+        return text ? (
+          <div>
+            <Barcode value={text} width={1} height={50} fontSize={12} />
+            {/* <div style={{ marginTop: "5px", fontSize: "12px", textAlign: "center" }}>{text}</div> */}
+          </div>
+        ) : "N/A";
       },
     },
   ];
@@ -120,13 +141,13 @@ const AdminReports = () => {
           type={activeReport === "sales" ? "primary" : "default"}
           onClick={() => setActiveReport("sales")}
         >
-          Sales Report
+          Sales Transactions
         </Button>
         <Button
           type={activeReport === "inventory" ? "primary" : "default"}
           onClick={() => setActiveReport("inventory")}
         >
-          Inventory Report
+          Inventory Modification
         </Button>
         <Button
           type={activeReport === "charts" ? "primary" : "default"}

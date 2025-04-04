@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Bill = require("../models/billsModel");
 const Item = require("../models/itemModel");
+const { getInventoryReport } = require("../controllers/reportsController");
 
 router.get("/", async (req, res) => {
   try {
@@ -38,22 +39,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/inventory", async (req, res) => {
-  try {
-    const items = await Item.find().select("name stock inventoryUpdated");
-    const formattedItems = items.map((item) => ({
-      ...item.toObject(),
-      inventoryUpdated: item.inventoryUpdated
-        ? new Date(item.inventoryUpdated).toISOString()
-        : null,
-    }));
-    console.log("Formatted inventory items:", formattedItems); // Log formatted items
-    res.json(formattedItems);
-  } catch (error) {
-    console.error("Error fetching inventory reports:", error);
-    res.status(500).json({ message: "Failed to fetch inventory reports" });
-  }
-});
+router.get("/inventory", getInventoryReport);
 
 router.get("/category-sales", async (req, res) => {
   try {
