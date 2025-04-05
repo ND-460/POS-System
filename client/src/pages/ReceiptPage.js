@@ -93,9 +93,9 @@ const ReceiptPage = () => {
             <tr key={index}>
               <td>{item?.itemName || "Unknown Item"}</td>
               <td>{item?.quantity || 0}</td>
-              <td>${(item?.originalPrice || 0).toFixed(2)}</td> {/* Display original price */}
-              <td>${(item?.discountedPrice || 0).toFixed(2)}</td> {/* Display discounted price */}
-              <td>${(item?.subtotal || 0).toFixed(2)}</td> {/* Display subtotal */}
+              <td><span>&#8377;</span>{(item?.originalPrice || 0).toFixed(2)}</td> {/* Display original price */}
+              <td><span>&#8377;</span>{(item?.discountedPrice || 0).toFixed(2)}</td> {/* Display discounted price */}
+              <td><span>&#8377;</span>{(item?.subtotal || 0).toFixed(2)}</td> {/* Display subtotal */}
               <td>{item?.loyaltyPoints || 0} pts</td>
             </tr>
           ))}

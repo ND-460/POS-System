@@ -131,9 +131,9 @@ const CustomerDashboard = () => {
         </Menu>
       </Sider>
       <Layout>
-        <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
+        {/* <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
           <h2>Welcome, {user?.name || "Customer"}</h2>
-        </Header>
+        </Header> */}
         <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
           <h2>Customer Dashboard</h2>
 
@@ -163,12 +163,12 @@ const CustomerDashboard = () => {
               <Option value="UPI">UPI</Option>
             </Select>
 
-            <Input
+            {/* <Input
               placeholder="Search Orders"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ width: 200 }}
-            />
+            /> */}
           </div>
 
           {/* Orders Table */}
@@ -183,7 +183,9 @@ const CustomerDashboard = () => {
               {
                 title: "Total Amount",
                 dataIndex: "totalAmount",
-                render: (amount) => `$${amount.toFixed(2)}`,
+                render: (amount) => (
+                  <span>&#8377;{amount.toFixed(2)}</span>
+                ),
               },
               { title: "Payment Method", dataIndex: "paymentMethod" },
               {
