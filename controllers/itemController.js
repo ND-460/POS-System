@@ -96,10 +96,21 @@ const updateInventoryController = async (req, res) => {
     res.status(500).json({ message: "Error updating inventory", error });
   }
 };
+const getLowStockItems = async (req, res) => {
+  try {
+    // Query items where stock is less than the lowStockAlert field
+    const lowStockItems = await itemModel.find({ $expr: { $lt: ["$stock", "$lowStockAlert"] } });
+    res.status(200).json(lowStockItems);
+  } catch (error) {
+    console.error("Error fetching low stock items:", error);
+    res.status(500).json({ message: "Error fetching low stock items", error });
+  }
+};
 module.exports = {
   getItemController,
   addItemController,
   editItemController,
   deleteItemController,
   updateInventoryController,
+  getLowStockItems,
 };

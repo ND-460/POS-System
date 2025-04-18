@@ -163,6 +163,10 @@ const AdminManageItems = () => {
             <InputNumber />
           </Form.Item>
 
+          <Form.Item name="lowStockAlert" label="Threshold" rules={[{ required: true, type: "number", min: 1 }]}>
+            <InputNumber />
+          </Form.Item>
+
           <Form.Item name="discount" label="Discount (%)">
             <InputNumber min={0} max={100} />
           </Form.Item>

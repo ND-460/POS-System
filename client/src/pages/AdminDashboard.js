@@ -5,12 +5,14 @@ import {
   UnorderedListOutlined,
   UserOutlined,
   LogoutOutlined,
-  HomeOutlined,
+  HomeOutlined, 
+  AlertOutlined,
 } from "@ant-design/icons";
 import AdminManageItems from "./AdminManageItem";
 import AdminManageCategories from "./AdminManageCategories";
 import AdminManageCashiers from "./AdminManageCashiers";
 import AdminReports from "./AdminReports";
+import AdminLowStockAlert from "./AdminLowStockAlert";  
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -69,13 +71,16 @@ const AdminDashboard = () => {
           <Menu.Item key="reports" icon={<AppstoreOutlined />}>
             Reports
           </Menu.Item>
+          <Menu.Item key="lowstock" icon={<AlertOutlined />}>
+            Low Stock Alerts
+          </Menu.Item>
           <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Logout
           </Menu.Item>
         </Menu>
       </Sider>
 
-      <Layout>
+      {/* <Layout> */}
         {/* <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
           <h2>Welcome, {user?.name || "Admin"}</h2>
         </Header> */}
@@ -84,8 +89,9 @@ const AdminDashboard = () => {
           {selectedSection === "categories" && <AdminManageCategories />}
           {selectedSection === "cashiers" && <AdminManageCashiers />}
           {selectedSection === "reports" && <AdminReports />}
+          {selectedSection === "lowstock" && <AdminLowStockAlert />}
         </Content>
-      </Layout>
+      {/* </Layout> */}
     </Layout>
   );
 };
