@@ -58,7 +58,7 @@ const CustomerAuth = () => {
       if (isRegister && values.birthdate) {
         values.birthdate = values.birthdate.format("YYYY-MM-DD"); // - Convert date before sending
       }
-
+      values.role = "customer"; 
       console.log("- Sending Data:", values);
 
       const endpoint = isRegister ? "/api/users/register" : "/api/users/login";

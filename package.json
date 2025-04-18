@@ -10,7 +10,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\" ",
     "seed": "node seeder.js"
   },
-  "author": "techinfoyt",
+  "author": "Neel",
   "license": "MIT",
   "dependencies": {
     "@react-oauth/google": "^0.12.1",

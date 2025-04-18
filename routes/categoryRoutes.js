@@ -21,8 +21,6 @@ router.post("/add", async (req, res) => {
     res.status(500).json({ message: "Error adding category", error });
   }
 });
-
-
 // -Get all categories
 router.get("/", async (req, res) => {
   try {
@@ -44,7 +42,6 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ message: "Error updating category", error });
   }
 });
-
 // -Delete category
 router.delete("/:id", async (req, res) => {
   try {
@@ -54,5 +51,4 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ message: "Error deleting category", error });
   }
 });
-
 module.exports = router;

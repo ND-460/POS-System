@@ -142,9 +142,9 @@ const CashierTransaction = () => {
         </Menu>
       </Sider>
       <Layout>
-        <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
+        {/* <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
           <h2>Welcome, {user?.name || "Cashier"}</h2>
-        </Header>
+        </Header> */}
         <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
           <h2>Cashier Transaction</h2>
           <Select

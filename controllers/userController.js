@@ -13,7 +13,6 @@ const loginController = async (req, res) => {
 
     const user = await User.findOne({ email }).select("+password");
     console.log("- User Found:", user);
-
     if (!user || user.password !== password) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -27,9 +26,6 @@ const loginController = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
-
-
 const generateQrLoginUrl = async (req, res) => {
   try {
     const loginUrl = `http://localhost:3000/customer-login`; // - Change as per frontend
@@ -39,22 +35,19 @@ const generateQrLoginUrl = async (req, res) => {
     res.status(500).json({ message: "Failed to generate QR Code URL" });
   }
 };
-
 // - Google Authentication Handler
 const googleAuth = passport.authenticate("google", { scope: ["profile", "email"] });
-
 // - Google Authentication Callback Handler
 const googleAuthCallback = async (req, res, next) => {
   passport.authenticate("google", async (err, user, info) => {
     if (err) {
-      console.error("🔥 Google Auth Error:", err);
+      console.error("- Google Auth Error:", err);
       return res.redirect("http://localhost:3000/customer-auth?error=GoogleAuthFailed");
     }
     if (!user) {
-      console.warn("⚠️ Google Auth Failed: No user found");
+      console.warn("- Google Auth Failed: No user found");
       return res.redirect("http://localhost:3000/customer-auth?error=GoogleAuthFailed");
     }
-
     // - Ensure user is saved in DB
     const existingUser = await User.findOne({ email: user.email });
     if (!existingUser) {
@@ -67,35 +60,28 @@ const googleAuthCallback = async (req, res, next) => {
       await newUser.save();
       console.log("- New Google User Saved:", newUser);
     }
-
     req.login(user, (err) => {
       if (err) {
-        console.error("🔥 Error logging in user:", err);
+        console.error("- Error logging in user:", err);
         return res.redirect("http://localhost:3000/customer-auth?error=GoogleAuthFailed");
       }
       return res.redirect(`http://localhost:3000/customer-auth?googleSuccess=true&userId=${user._id}`);
     });
   })(req, res, next);
 };
-
-
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
       console.log("- Invalid User ID format:", id);
       return res.status(400).json({ message: "Invalid User ID format" });
     }
-
     const user = await User.findById(id).select("name mobile role"); // Fetch only necessary fields
     console.log("- Fetching User with ID:", id);
-
     if (!user || user.role !== "customer") { // Ensure the user is a customer
       console.log("- Customer not found for ID:", id);
       return res.status(404).json({ message: "Customer not found" });
     }
-
     res.status(200).json(user);
   } catch (error) {
     console.error("- Error fetching user:", error);

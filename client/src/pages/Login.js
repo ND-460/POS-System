@@ -37,7 +37,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <Card className="login-card">
-        <Title level={2} className="login-title">Welcome to POS</Title>
+        <Title level={2} className="login-title">POS(cashier/admin)</Title>
         <Form onFinish={handleLogin} layout="vertical">
           <Form.Item name="email" rules={[{ required: true, message: "Enter your email" }]}>
             <Input prefix={<UserOutlined />} placeholder="Email" />

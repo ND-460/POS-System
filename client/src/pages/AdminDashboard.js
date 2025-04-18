@@ -76,9 +76,9 @@ const AdminDashboard = () => {
       </Sider>
 
       <Layout>
-        <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
+        {/* <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
           <h2>Welcome, {user?.name || "Admin"}</h2>
-        </Header>
+        </Header> */}
         <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
           {selectedSection === "items" && <AdminManageItems />}
           {selectedSection === "categories" && <AdminManageCategories />}
