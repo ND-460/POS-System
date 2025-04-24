@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -21,5 +20,21 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.statics.getBirthdayCustomers = async function () {
+  const today = new Date();
+  const month = today.getMonth() + 1; // Months are 0-indexed
+  const day = today.getDate();
+
+  return this.find({
+    role: "customer",
+    birthdate: { $exists: true },
+    $expr: {
+      $and: [
+        { $eq: [{ $month: "$birthdate" }, month] },
+        { $eq: [{ $dayOfMonth: "$birthdate" }, day] },
+      ],
+    },
+  });
+};
 
 module.exports = mongoose.model("User", userSchema);

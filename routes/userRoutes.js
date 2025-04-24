@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { loginController, registerController, getCashiers, updateCashier, deleteCashier, getCustomers,getPastOrders,getLoyaltyPoints,generateQrLoginUrl,googleAuth,googleAuthCallback,getUserById } = require("../controllers/userController");
+const { loginController, registerController, getCashiers, updateCashier, deleteCashier, getCustomers,getPastOrders,getLoyaltyPoints,generateQrLoginUrl,googleAuth,googleAuthCallback,getUserById, sendMsg, createEvent, getEvents, applyBirthdayDiscount, updateEvent } = require("../controllers/userController");
 
 // - Get All Cashiers
 router.get("/cashiers", getCashiers);
@@ -17,6 +17,15 @@ router.get("/customers", getCustomers);
 
 // - Fetch Orders for a Customer
 router.get("/:customerId/orders", getPastOrders);
+
+// - Create Event
+router.post("/events", createEvent);
+
+// - Get Events
+router.get("/events", getEvents);
+
+// - Update Event
+router.put("/events/:id", updateEvent);
 
 // - Fetch Customer Loyalty Points
 router.get("/:id/loyalty-points", getLoyaltyPoints);
@@ -40,5 +49,10 @@ router.get("/auth/google/callback", googleAuthCallback);
 
 // - Get Customer by ID
 router.get("/customers/:id", getUserById);
+
+router.get("/send-email",sendMsg);
+
+// - Apply Birthday Discount
+router.post("/apply-birthday-discount", applyBirthdayDiscount);
 
 module.exports = router;

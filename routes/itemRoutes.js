@@ -55,4 +55,6 @@ router.put("/:id/inventory", updateInventoryController);
 // - Get low stock items
 router.get("/low-stock",getLowStockItems);
 
+
+
 module.exports = router;

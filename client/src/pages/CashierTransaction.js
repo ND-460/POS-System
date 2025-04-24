@@ -7,6 +7,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
 
 const { Option } = Select;
 const { Header, Sider, Content } = Layout;
@@ -19,6 +20,8 @@ const CashierTransaction = () => {
   const [customer, setCustomer] = useState("");
   const [customersList, setCustomersList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [activeEvent, setActiveEvent] = useState(null);
+  const [eventDiscount, setEventDiscount] = useState(0);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -58,6 +61,27 @@ const CashierTransaction = () => {
     setTotal(cart.reduce((sum, item) => sum + item.price * item.quantity, 0));
   }, [cart]);
 
+  useEffect(() => {
+    const fetchActiveEvent = async () => {
+      try {
+        const { data } = await axios.get("http://localhost:8080/api/events");
+        const today = moment();
+        const active = data.find((event) => moment(event.date).isSame(today, "day"));
+        if (active) {
+          setActiveEvent(active);
+          setEventDiscount(active.discount);
+        } else {
+          setActiveEvent(null);
+          setEventDiscount(0);
+        }
+      } catch (error) {
+        console.error("Error fetching active events:", error);
+      }
+    };
+
+    fetchActiveEvent();
+  }, []);
+
   const scanBarcode = async () => {
     try {
       const { data } = await axios.get(`http://localhost:8080/api/items/barcode/${barcode}`);
@@ -87,6 +111,24 @@ const CashierTransaction = () => {
     setCart(cart.filter((_, i) => i !== index));
   };
 
+  const calculateTotalWithDiscount = () => {
+    const baseTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    if (activeEvent && activeEvent.categories?.length > 0) {
+      // Apply discount only to items in the event categories
+      const discountTotal = cart.reduce((sum, item) => {
+        if (activeEvent.categories.includes(item.category)) {
+          return sum + (item.price * item.quantity * activeEvent.discount) / 100;
+        }
+        return sum;
+      }, 0);
+
+      return baseTotal - discountTotal;
+    }
+
+    return baseTotal;
+  };
+
   const completeTransaction = async () => {
     if (cart.length === 0) {
       message.error("Cart is empty!");
@@ -105,8 +147,10 @@ const CashierTransaction = () => {
           quantity,
           price,
         })),
-        totalAmount: total,
+        totalAmount: calculateTotalWithDiscount(),
         paymentMethod,
+        eventDiscount: activeEvent ? activeEvent.discount : 0,
+        eventTitle: activeEvent ? activeEvent.title : null,
       };
 
       const response = await axios.post("http://localhost:8080/api/bills/complete", transaction);
@@ -147,6 +191,11 @@ const CashierTransaction = () => {
         </Header> */}
         <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
           <h2>Cashier Transaction</h2>
+          {activeEvent && (
+            <div style={{ marginBottom: "10px", color: "green" }}>
+              <strong>Active Event:</strong> {activeEvent.title} - {activeEvent.discount}% Discount
+            </div>
+          )}
           <Select
             showSearch
             allowClear
@@ -198,7 +247,7 @@ const CashierTransaction = () => {
             rowKey="_id"
           />
 
-          <h3>Total: <span>&#8377;</span>{total.toFixed(2)}</h3>
+          <h3>Total: <span>&#8377;</span>{calculateTotalWithDiscount().toFixed(2)}</h3>
           <Select value={paymentMethod} onChange={setPaymentMethod} style={{ marginBottom: "10px" }}>
             <Option value="cash">Cash</Option>
             <Option value="loyalty points">Loyalty Points</Option>

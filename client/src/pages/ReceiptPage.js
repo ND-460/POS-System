@@ -105,6 +105,14 @@ const ReceiptPage = () => {
       <div className="total-section">
         <strong>Total: <span>&#8377;</span>{bill?.totalAmount?.toFixed(2) || "0.00"}</strong> {/* Display correct total */}
       </div>
+      {bill?.eventTitle && (
+        <p>
+          <strong>Event Applied:</strong> {bill.eventTitle} ({bill.eventDiscount}% Discount)
+        </p>
+      )}
+      <div className="total-section">
+        <strong>Total After Discount: <span>&#8377;</span>{bill?.totalAmount?.toFixed(2) || "0.00"}</strong>
+      </div>
       <p><strong>Payment Method:</strong> {bill?.paymentMethod || "N/A"}</p>
       <p>
         <strong>Loyalty Points Earned:</strong>{" "}

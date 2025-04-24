@@ -9,6 +9,7 @@ const { bgCyan } = require("colors");
 require("./config/passport");
 require("colors");
 const connectDb = require("./config/config");
+const userRoutes = require("./routes/userRoutes");
 //dotenv config
 dotanv.config();
 //db config
@@ -52,6 +53,7 @@ app.use("/api/reports", reportsRoute);
 app.use("/api/items", require("./routes/itemRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/bills", require("./routes/billsRoute"));
+app.use("/api", userRoutes);
 
 //port
 const PORT = process.env.PORT || 8080;

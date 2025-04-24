@@ -1,10 +1,13 @@
-const mongoose = require("mongoose"); 
+const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const Bill = require("../models/billsModel");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client("YOUR_GOOGLE_CLIENT_ID");
+const sendEmail = require("../config/mailer");
+const Event = require("../models/eventModel");
+
 // - Login User
 const loginController = async (req, res) => {
   try {
@@ -36,17 +39,23 @@ const generateQrLoginUrl = async (req, res) => {
   }
 };
 // - Google Authentication Handler
-const googleAuth = passport.authenticate("google", { scope: ["profile", "email"] });
+const googleAuth = passport.authenticate("google", {
+  scope: ["profile", "email"],
+});
 // - Google Authentication Callback Handler
 const googleAuthCallback = async (req, res, next) => {
   passport.authenticate("google", async (err, user, info) => {
     if (err) {
       console.error("- Google Auth Error:", err);
-      return res.redirect("http://localhost:3000/customer-auth?error=GoogleAuthFailed");
+      return res.redirect(
+        "http://localhost:3000/customer-auth?error=GoogleAuthFailed"
+      );
     }
     if (!user) {
       console.warn("- Google Auth Failed: No user found");
-      return res.redirect("http://localhost:3000/customer-auth?error=GoogleAuthFailed");
+      return res.redirect(
+        "http://localhost:3000/customer-auth?error=GoogleAuthFailed"
+      );
     }
     // - Ensure user is saved in DB
     const existingUser = await User.findOne({ email: user.email });
@@ -55,7 +64,7 @@ const googleAuthCallback = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: "customer",
-        isVerified: true, 
+        isVerified: true,
       });
       await newUser.save();
       console.log("- New Google User Saved:", newUser);
@@ -63,9 +72,13 @@ const googleAuthCallback = async (req, res, next) => {
     req.login(user, (err) => {
       if (err) {
         console.error("- Error logging in user:", err);
-        return res.redirect("http://localhost:3000/customer-auth?error=GoogleAuthFailed");
+        return res.redirect(
+          "http://localhost:3000/customer-auth?error=GoogleAuthFailed"
+        );
       }
-      return res.redirect(`http://localhost:3000/customer-auth?googleSuccess=true&userId=${user._id}`);
+      return res.redirect(
+        `http://localhost:3000/customer-auth?googleSuccess=true&userId=${user._id}`
+      );
     });
   })(req, res, next);
 };
@@ -78,7 +91,8 @@ const getUserById = async (req, res) => {
     }
     const user = await User.findById(id).select("name mobile role"); // Fetch only necessary fields
     console.log("- Fetching User with ID:", id);
-    if (!user || user.role !== "customer") { // Ensure the user is a customer
+    if (!user || user.role !== "customer") {
+      // Ensure the user is a customer
       console.log("- Customer not found for ID:", id);
       return res.status(404).json({ message: "Customer not found" });
     }
@@ -116,16 +130,14 @@ const registerController = async (req, res) => {
 
     await newUser.save();
 
-    res.status(201).json({ message: "User registered successfully!", user: newUser });
+    res
+      .status(201)
+      .json({ message: "User registered successfully!", user: newUser });
   } catch (error) {
     console.error("- Error registering user:", error);
     res.status(500).json({ message: "Registration failed", error });
   }
 };
-
-
-
-
 
 // - Get All Cashiers
 const getCashiers = async (req, res) => {
@@ -172,13 +184,12 @@ const deleteCashier = async (req, res) => {
     res.status(500).json({ message: "Error deleting cashier", error });
   }
 };
-
-
-
 // - Get All Customers
 const getCustomers = async (req, res) => {
   try {
-    const customers = await User.find({ role: "customer" }).select("name mobile loyaltyPoints");
+    const customers = await User.find({ role: "customer" }).select(
+      "name mobile loyaltyPoints"
+    );
     res.status(200).json(customers);
   } catch (error) {
     console.error("- Error fetching customers:", error);
@@ -198,15 +209,15 @@ const getPastOrders = async (req, res) => {
     console.log(`- Fetching Orders for Customer ID: ${customerId}`); // - Debugging
 
     const orders = await Bill.find({ customer: customerId })
-    .populate("items.item", "name")
-    .select("_id createdAt totalAmount paymentMethod");
+      .populate("items.item", "name")
+      .select("_id createdAt totalAmount paymentMethod");
 
-  res.status(200).json(orders);
+    res.status(200).json(orders);
   } catch (error) {
     console.error("- Error fetching customer orders:", error);
     res.status(500).json({ message: "Error fetching orders", error });
   }
-}
+};
 
 const getLoyaltyPoints = async (req, res) => {
   try {
@@ -236,6 +247,93 @@ const getLoyaltyPoints = async (req, res) => {
   }
 };
 
+const sendMsg = async (req, res) => {
+  try {
+    const { email, subject, message } = req.body;
+    console.log("- Sending message to:", email);
+    sendEmail({
+      email,
+      subject,
+      message,
+    });
+    console.log("- Message sent successfully to:", email);
+  } catch (error) {
+    console.error("- Error sending message:", error);
+    res.status(500).json({ message: "Error sending message" });
+  }
+};
+
+const createEvent = async (req, res) => {
+  try {
+    const { title, description, discount, date, categories, items } = req.body;
+
+    if (!title || !description || !discount || !date) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const newEvent = new Event({ title, description, discount, date, categories, items });
+    await newEvent.save();
+
+    res.status(201).json({ message: "Event created successfully!", event: newEvent });
+  } catch (error) {
+    console.error("- Error creating event:", error);
+    res.status(500).json({ message: "Error creating event", error });
+  }
+};
+
+const getEvents = async (req, res) => {
+  try {
+    const events = await Event.find().populate("items", "name");
+    res.status(200).json(events);
+  } catch (error) {
+    console.error("- Error fetching events:", error);
+    res.status(500).json({ message: "Error fetching events", error });
+  }
+};
+
+const updateEvent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedEvent = await Event.findByIdAndUpdate(id, req.body, { new: true });
+
+    if (!updatedEvent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    res.status(200).json({ message: "Event updated successfully!", event: updatedEvent });
+  } catch (error) {
+    console.error("- Error updating event:", error);
+    res.status(500).json({ message: "Error updating event", error });
+  }
+};
+
+const applyBirthdayDiscount = async (req, res) => {
+  try {
+    const birthdayCustomers = await User.getBirthdayCustomers();
+    const discount = 20; // Default birthday discount percentage
+
+    for (const customer of birthdayCustomers) {
+      // Add the discount to the customer's special discounts
+      customer.specialDiscounts.push(`Birthday Discount: ${discount}%`);
+      await customer.save();
+
+      // Send an email notification
+      await sendEmail({
+        email: customer.email,
+        subject: "Happy Birthday! 🎉",
+        message: `Dear ${customer.name},\n\nHappy Birthday! As a token of our appreciation, we're giving you a special ${discount}% discount today. Enjoy your day!\n\nBest regards,\nYour POS Team`,
+      });
+    }
+
+    res.status(200).json({
+      message: `${birthdayCustomers.length} customers received the birthday discount.`,
+    });
+  } catch (error) {
+    console.error("- Error applying birthday discount:", error);
+    res.status(500).json({ message: "Error applying birthday discount", error });
+  }
+};
+
 module.exports = {
   loginController,
   registerController,
@@ -248,5 +346,10 @@ module.exports = {
   generateQrLoginUrl,
   googleAuth,
   googleAuthCallback,
-  getUserById
+  getUserById,
+  sendMsg,
+  createEvent,
+  getEvents,
+  updateEvent,
+  applyBirthdayDiscount,
 };

@@ -7,12 +7,14 @@ import {
   LogoutOutlined,
   HomeOutlined, 
   AlertOutlined,
+  MessageOutlined
 } from "@ant-design/icons";
 import AdminManageItems from "./AdminManageItem";
 import AdminManageCategories from "./AdminManageCategories";
 import AdminManageCashiers from "./AdminManageCashiers";
 import AdminReports from "./AdminReports";
 import AdminLowStockAlert from "./AdminLowStockAlert";  
+import AdminEventAlert from "./AdminEventAlert";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -74,6 +76,9 @@ const AdminDashboard = () => {
           <Menu.Item key="lowstock" icon={<AlertOutlined />}>
             Low Stock Alerts
           </Menu.Item>
+          <Menu.Item key="EventsMessage" icon={<MessageOutlined />}>
+            Message
+          </Menu.Item>
           <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Logout
           </Menu.Item>
@@ -90,6 +95,7 @@ const AdminDashboard = () => {
           {selectedSection === "cashiers" && <AdminManageCashiers />}
           {selectedSection === "reports" && <AdminReports />}
           {selectedSection === "lowstock" && <AdminLowStockAlert />}
+          {selectedSection === "EventsMessage" && <AdminEventAlert />}
         </Content>
       {/* </Layout> */}
     </Layout>
