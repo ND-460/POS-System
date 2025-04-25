@@ -37,8 +37,15 @@ const loginController = async (req, res) => {
 
     console.log("- Login Successful for:", user.role);
 
-    // - Send user object in response
-    res.status(200).json({ message: "Login successful", user });
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "default-secret",
+      { expiresIn: "1h" }
+    );
+
+    // - Send user object and token in response
+    res.status(200).json({ message: "Login successful", user, token });
   } catch (error) {
     console.error("- Login Error:", error);
     res.status(500).json({ message: "Server error", error });
