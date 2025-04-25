@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { loginController, registerController, getCashiers, updateCashier, deleteCashier, getCustomers,getPastOrders,getLoyaltyPoints,generateQrLoginUrl,googleAuth,googleAuthCallback,getUserById, sendMsg, createEvent, getEvents, applyBirthdayDiscount, updateEvent } = require("../controllers/userController");
+const { deleteEvent } = require("../controllers/eventsController");
 
 // - Get All Cashiers
 router.get("/cashiers", getCashiers);
@@ -26,6 +27,8 @@ router.get("/events", getEvents);
 
 // - Update Event
 router.put("/events/:id", updateEvent);
+
+router.delete("/events/:id",deleteEvent);
 
 // - Fetch Customer Loyalty Points
 router.get("/:id/loyalty-points", getLoyaltyPoints);

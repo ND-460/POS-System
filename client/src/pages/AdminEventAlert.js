@@ -95,8 +95,12 @@ const AdminEventAlert = () => {
       message.success("Event deleted successfully!");
       setEvents((prevEvents) => prevEvents.filter((event) => event._id !== id));
     } catch (error) {
-      console.error("Error deleting event:", error.response?.data || error.message);
-      message.error(error.response?.data?.message || "Error deleting event");
+      if (error.response?.status === 404) {
+        message.error("Event not found. It may have already been deleted.");
+      } else {
+        console.error("Error deleting event:", error.response?.data || error.message);
+        message.error(error.response?.data?.message || "Error deleting event");
+      }
     }
   };
 
@@ -141,7 +145,7 @@ const AdminEventAlert = () => {
           <Form.Item name="categories" label="Categories">
             <Select mode="multiple" placeholder="Select categories">
               {categories.map((category) => (
-                <Option key={category._id} value={category.name}>
+                <Option key={category._id} value={category._id}> {/* Use category ID */}
                   {category.name}
                 </Option>
               ))}
@@ -151,7 +155,7 @@ const AdminEventAlert = () => {
           <Form.Item name="items" label="Items">
             <Select mode="multiple" placeholder="Select items">
               {items.map((item) => (
-                <Option key={item._id} value={item._id}>
+                <Option key={item._id} value={item._id}> {/* Use item ID */}
                   {item.name}
                 </Option>
               ))}

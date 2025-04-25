@@ -6,8 +6,8 @@ const eventSchema = new mongoose.Schema(
     description: { type: String, required: true },
     discount: { type: Number, required: true },
     date: { type: Date, required: true },
-    categories: [{ type: String }], // Array of category names
-    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Item" }], // Array of item IDs
+    categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }], // Reference to Category model
+    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Item" }], // Reference to Item model
   },
   { timestamps: true }
 );

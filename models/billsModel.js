@@ -11,11 +11,13 @@ const billSchema = new mongoose.Schema(
         itemName: { type: String, required: true }, // Store item name
         quantity: { type: Number, required: true },
         price: { type: Number, required: true },
-        discount: { type: Number, default: 0 }, // Discount percentage
-        loyaltyPoints: { type: Number, default: 0 }, // Points earned for this item
-        originalPrice: { type: Number, required: true }, // Store original price
-        discountedPrice: { type: Number, required: true }, // Store discounted price
-        subtotal: { type: Number, required: true }, // Store subtotal
+        originalPrice: { type: Number, required: true }, // Original price before discounts
+        itemDiscount: { type: Number, default: 0 }, // Item's base discount percentage
+        eventDiscount: { type: Number, default: 0 }, // Event discount percentage
+        itemDiscountAmount: { type: Number, default: 0 }, // Amount saved from item discount
+        eventDiscountAmount: { type: Number, default: 0 }, // Amount saved from event discount
+        subtotal: { type: Number, required: true }, // Final price after all discounts
+        loyaltyPoints: { type: Number, default: 0 },
       },
     ],
     totalAmount: { type: Number, required: true },
@@ -24,6 +26,11 @@ const billSchema = new mongoose.Schema(
       type: String, 
       enum: ["cash", "cheque", "loyalty points", "UPI"], // Removed "mixed"
       required: true 
+    },
+    event: {
+      id: { type: mongoose.Schema.Types.ObjectId, ref: "Event" },
+      title: { type: String },
+      discount: { type: Number }
     },
     loyaltyPointsUsed: { type: Number, default: 0 }, // Track loyalty points used
   },

@@ -114,10 +114,12 @@ const CashierTransaction = () => {
   const calculateTotalWithDiscount = () => {
     const baseTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    if (activeEvent && activeEvent.categories?.length > 0) {
-      // Apply discount only to items in the event categories
+    if (activeEvent) {
       const discountTotal = cart.reduce((sum, item) => {
-        if (activeEvent.categories.includes(item.category)) {
+        if (
+          activeEvent.items.some(eventItem => eventItem === item._id) || 
+          activeEvent.categories.some(eventCategory => eventCategory === item.category)
+        ) {
           return sum + (item.price * item.quantity * activeEvent.discount) / 100;
         }
         return sum;
