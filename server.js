@@ -62,3 +62,26 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server Running On Port ${PORT}`.bgCyan.white);
 });
+
+// JWT Middleware
+const jwt = require("jsonwebtoken");
+
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Access denied. No token provided." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "default-secret");
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(400).json({ message: "Invalid token." });
+  }
+};
+
+// Example: Protecting a route
+app.use("/api/protected-route", verifyToken, (req, res) => {
+  res.status(200).json({ message: "Access granted to protected route." });
+});

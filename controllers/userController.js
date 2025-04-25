@@ -7,6 +7,7 @@ const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client("YOUR_GOOGLE_CLIENT_ID");
 const sendEmail = require("../config/mailer");
 const Event = require("../models/eventModel");
+const bcrypt = require("bcryptjs");
 
 // - Login User
 const loginController = async (req, res) => {
@@ -16,14 +17,35 @@ const loginController = async (req, res) => {
 
     const user = await User.findOne({ email }).select("+password");
     console.log("- User Found:", user);
-    if (!user || user.password !== password) {
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    let isMatch = false;
+
+    // Check if the password matches the hashed version
+    if (user.password.startsWith("$2a$") || user.password.startsWith("$2b$")) {
+      isMatch = await bcrypt.compare(password, user.password);
+    } else {
+      // Fallback for non-hashed passwords
+      isMatch = user.password === password;
+    }
+
+    if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
     console.log("- Login Successful for:", user.role);
 
-    // - Send user object in response
-    res.status(200).json({ message: "Login successful", user });
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "default-secret",
+      { expiresIn: "1h" }
+    );
+
+    // - Send user object and token in response
+    res.status(200).json({ message: "Login successful", user, token });
   } catch (error) {
     console.error("- Login Error:", error);
     res.status(500).json({ message: "Server error", error });
@@ -119,12 +141,14 @@ const registerController = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+
     const newUser = new User({
       name,
       email,
       mobile,
       birthdate,
-      password,
+      password: hashedPassword, // Save hashed password
       role, // Ensure role is set correctly
     });
 
