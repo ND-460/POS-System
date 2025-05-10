@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Input, message, Form, InputNumber, Select } from "antd";
+import { Table, Button, Input, message, Form, InputNumber, Select, Modal, Row, Col } from "antd";
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
 import Barcode from "react-barcode";
@@ -14,6 +14,7 @@ const AdminManageItems = () => {
   const [sortOption, setSortOption] = useState("name-asc");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     loadItems();
@@ -23,7 +24,7 @@ const AdminManageItems = () => {
   // Load items from backend
   const loadItems = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8080/api/items");
+      const { data } = await axios.get("api/items");
       setItems(data);
     } catch (error) {
       message.error("Failed to load items");
@@ -32,7 +33,7 @@ const AdminManageItems = () => {
 
   const loadCategories = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8080/api/categories");
+      const { data } = await axios.get("api/categories");
       console.log("Categories Fetched:", data); // -Debugging Log
       setCategories(data);
     } catch (error) {
@@ -44,39 +45,40 @@ const AdminManageItems = () => {
   // Add or update item
   const handleSubmit = async (values) => {
     try {
+      console.log("Form Values:", values); // -Debugging Log
       if (editingItem) {
-        console.log(` Updating Item ID: ${editingItem}`);
-        await axios.put(`http://localhost:8080/api/items/${editingItem}`, values);
+        console.log(`Updating Item ID: ${editingItem}`);
+        await axios.put(`api/items/${editingItem}`, values);
         message.success("Item updated successfully!");
-        
-        //  Update the item in the state
+
+        // Update the item in the state
         setItems((prevItems) =>
           prevItems.map((item) =>
             item._id === editingItem ? { ...item, ...values } : item
           )
         );
-        
+
         setEditingItem(null);
       } else {
-        console.log(" Adding New Item");
-        await axios.post("http://localhost:8080/api/items/add", values);
+        console.log("Adding New Item");
+        await axios.post("api/items/add", values);
         message.success("Item added successfully!");
       }
-      
+
       form.resetFields();
-      loadItems(); //  Reload items after update/add
+      setIsModalOpen(false); // Close the modal after successful submission
+      loadItems(); // Reload items after update/add
     } catch (error) {
-      console.error(" Error saving item:", error.response?.data || error.message);
+      console.error("Error saving item:", error.response?.data || error.message);
       message.error(error.response?.data?.message || "Error saving item");
     }
   };
-  
 
   // Delete item
   const handleDelete = async (id) => {
     try {
       console.log(` Deleting Item ID: ${id}`);
-      await axios.delete(`http://localhost:8080/api/items/${id}`);
+      await axios.delete(`api/items/${id}`);
       message.success("Item deleted successfully!");
   
       //  Remove the item from state after deletion
@@ -92,6 +94,7 @@ const AdminManageItems = () => {
   // Set item for editing
   const handleEdit = (item) => {
     setEditingItem(item._id);
+    setIsModalOpen(true);
     form.setFieldsValue(item);
   };
 
@@ -127,70 +130,50 @@ const AdminManageItems = () => {
           item.barcode.includes(searchTerm))
     );
 
+  const handleAddItem = () => {
+    setEditingItem(null);
+    form.resetFields();
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    form.resetFields();
+  };
+
   return (
     <div>
       {/* Item Form */}
-      <div style={{ border: "1px solid #ccc", padding: "16px", marginBottom: "16px", borderRadius: "8px" }}>
+      <div
+        style={{
+          padding: "16px",
+          marginBottom: "16px",
+          borderRadius: "8px",
+          overflowX: "auto", // Add horizontal scrolling for smaller screens
+        }}
+      >
         <h2>Manage Items</h2>
-        <Form form={form} onFinish={handleSubmit} layout="vertical">
-          <Form.Item name="name" label="Item Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
-            <Select placeholder="Select a category">
-              {categories.length > 0 ? (
-                categories.map((cat) => (
-                  <Option key={cat._id} value={cat.name}>
-                    {cat.name}
-                  </Option>
-                ))
-              ) : (
-                <Option disabled>No Categories Found</Option>
-              )}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="barcode" label="Barcode" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="price" label="Price" rules={[{ required: true, type: "number", min: 1 }]}>
-            <InputNumber />
-          </Form.Item>
-
-          <Form.Item name="stock" label="Stock Quantity" rules={[{ required: true, type: "number", min: 1 }]}>
-            <InputNumber />
-          </Form.Item>
-
-          <Form.Item name="lowStockAlert" label="Threshold" rules={[{ required: true, type: "number", min: 1 }]}>
-            <InputNumber />
-          </Form.Item>
-
-          <Form.Item name="discount" label="Discount (%)">
-            <InputNumber min={0} max={100} />
-          </Form.Item>
-
-          <Form.Item name="loyaltyPoints" label="Loyalty Points" rules={[{ required: true, type: "number", min: 0 }]}>
-            <InputNumber />
-          </Form.Item>
-
-          <Button type="primary" htmlType="submit">
-            {editingItem ? "Update Item" : "Add Item"}
-          </Button>
-        </Form>
+        <Button type="primary" onClick={handleAddItem} style={{ marginBottom: "16px" }}>
+          Add Item
+        </Button>
       </div>
 
       {/* Item List Table with Sorting & Filtering Options */}
-      <div style={{ border: "1px solid #ccc", padding: "16px", borderRadius: "8px" }}>
-        <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
-          <Select value={sortOption} onChange={handleSort} style={{ width: 200 }}>
+      <div
+        style={{
+          padding: "16px",
+          borderRadius: "8px",
+          overflowX: "auto", // Add horizontal scrolling for the table
+        }}
+      >
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "16px" }}>
+          <Select value={sortOption} onChange={handleSort} style={{ flex: "1 1 200px" }}>
             <Option value="name-asc">Sort: Name (A-Z)</Option>
             <Option value="name-desc">Sort: Name (Z-A)</Option>
             <Option value="price-asc">Sort: Price (Low to High)</Option>
             <Option value="price-desc">Sort: Price (High to Low)</Option>
           </Select>
-          <Select value={categoryFilter} onChange={handleFilter} style={{ width: 200 }}>
+          <Select value={categoryFilter} onChange={handleFilter} style={{ flex: "1 1 200px" }}>
             <Option value="all">Filter: All Categories</Option>
             {categories.map((cat) => (
               <Option key={cat._id} value={cat.name}>
@@ -202,7 +185,7 @@ const AdminManageItems = () => {
             placeholder="Search Items"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ width: 200 }}
+            style={{ flex: "1 1 200px" }}
           />
         </div>
 
@@ -216,16 +199,10 @@ const AdminManageItems = () => {
             { title: "Loyalty Points", dataIndex: "loyaltyPoints" },
             {
               title: "Barcode",
-              dataIndex:"barcode",
-              render:(text)=>{
-                return text ? (
-                  <div>
-                    <Barcode value={text} width={1} height={50} fontSize={12} />
-                    {/* <div style={{ marginTop: "5px", fontSize: "12px", textAlign: "center" }}>{text}</div> */}
-                  </div>
-                ) : "N/A";
-              }
-            }, // Ensure loyalty points are displayed
+              dataIndex: "barcode",
+              render: (text) =>
+                text ? <Barcode value={text} width={1} height={50} fontSize={12} /> : "N/A",
+            },
             {
               title: "Action",
               render: (_, record) => (
@@ -239,8 +216,71 @@ const AdminManageItems = () => {
             },
           ]}
           rowKey="_id"
+          scroll={{ x: 600 }} // Enable horizontal scrolling for the table
         />
       </div>
+
+      {/* Modal for Adding/Editing Item */}
+      <Modal
+        title={editingItem ? "Edit Item" : "Add Item"}
+        open={isModalOpen}
+        onCancel={closeModal}
+        footer={null}
+      >
+        <Form form={form} onFinish={handleSubmit} layout="vertical">
+          <Row gutter={[16, 16]}>
+            <Col xs={24}>
+              <Form.Item name="name" label="Item Name" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item name="category" label="Category" rules={[{ required: true }]}>
+                <Select placeholder="Select a category">
+                  {categories.map((cat) => (
+                    <Option key={cat._id} value={cat.name}>
+                      {cat.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item name="barcode" label="Barcode" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item name="price" label="Price" rules={[{ required: true, type: "number", min: 1 }]}>
+                <InputNumber style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item name="stock" label="Stock Quantity" rules={[{ required: true, type: "number", min: 1 }]}>
+                <InputNumber style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item name="lowStockAlert" label="Threshold" rules={[{ required: true, type: "number", min: 1 }]}>
+                <InputNumber style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item name="discount" label="Discount (%)">
+                <InputNumber min={0} max={100} style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item name="loyaltyPoints" label="Loyalty Points" rules={[{ required: true, type: "number", min: 0 }]}>
+                <InputNumber style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Button type="primary" htmlType="submit">
+            {editingItem ? "Update Item" : "Add Item"}
+          </Button>
+        </Form>
+      </Modal>
     </div>
   );
 };

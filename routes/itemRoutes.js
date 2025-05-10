@@ -18,17 +18,20 @@ router.get("/barcode/:barcode", async (req, res) => {
 // -Add new item
 router.post("/add", async (req, res) => {
   try {
-    const { name, category, price, stock, barcode, discount, description } = req.body;
+    console.log("Incoming Request Body:", req.body); // Debugging log
+    const { name, category, price, stock, barcode, discount, description, loyaltyPoints } = req.body;
 
     // Ensure barcode is unique
     const existingItem = await Item.findOne({ barcode });
     if (existingItem) return res.status(400).json({ message: "Barcode already exists" });
 
-    const newItem = new Item({ name, category, price, stock, barcode, discount, description });
+    const newItem = new Item({ name, category, price, stock, barcode, discount, description, loyaltyPoints });
     await newItem.save();
 
+    console.log("Item Added:", newItem); // Debugging log
     res.status(201).json({ message: "Item added successfully", item: newItem });
   } catch (error) {
+    console.error("Error adding item:", error); // Debugging log for errors
     res.status(500).json({ message: "Error adding item", error });
   }
 });

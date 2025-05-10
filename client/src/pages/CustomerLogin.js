@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Button, Typography, Spin, message } from "antd";
+import { Card, Button, Typography, Spin, message, Row, Col } from "antd";
 import { GoogleOutlined, QrcodeOutlined } from "@ant-design/icons";
 import axios from "axios";
 import QRCode from "qrcode.react"; // - QR Code Generator
@@ -17,7 +17,7 @@ const CustomerLogin = () => {
     // - Fetch QR Code URL from the server
     const fetchQrCode = async () => {
       try {
-        const { data } = await axios.get("http://localhost:8080/api/users/qr-login-url");
+        const { data } = await axios.get("api/users/qr-login-url");
         setQrCodeUrl(data.qrUrl);
       } catch (error) {
         console.error("- Error fetching QR code:", error);
@@ -30,30 +30,80 @@ const CustomerLogin = () => {
 
   // - Google Sign-In Handler
   const handleGoogleSignIn = () => {
-    window.location.href = "http://localhost:8080/api/users/auth/google";
+    window.location.href = "/api/users/auth/google";
   };
 
   return (
-    <div className="customer-login-container">
-      <Card className="login-card">
-        <Title level={2} className="login-title">Customer Login</Title>
+    <div style={{ minHeight: "100vh", background: "#f0f2f5", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <Card
+        style={{
+          maxWidth: 400,
+          width: "100%",
+          borderRadius: 12,
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+          padding: 24,
+          background: "#fff",
+        }}
+      >
+        <Row justify="center" align="middle">
+          <Col span={24}>
+            <Title level={2} style={{ color: "#1890ff", textAlign: "center", marginBottom: 24 }}>
+              Customer Login
+            </Title>
+          </Col>
 
-        {/* - QR Code Login */}
-        <div className="qr-container">
-          <Title level={4}>Scan to Login</Title>
-          {qrCodeUrl ? <QRCode value={qrCodeUrl} size={200} /> : <Spin size="large" />}
-          <Text type="secondary">Use your phone to scan and login.</Text>
-        </div>
+          {/* - QR Code Login */}
+          <Col span={24} style={{ textAlign: "center", marginBottom: 24 }}>
+            <Title level={4} style={{ color: "#333", marginBottom: 16 }}>
+              Scan to Login
+            </Title>
+            {qrCodeUrl ? (
+              <QRCode value={qrCodeUrl} size={200} />
+            ) : (
+              <Spin size="large" />
+            )}
+            <Text type="secondary" style={{ display: "block", marginTop: 16 }}>
+              Use your phone to scan and login.
+            </Text>
+          </Col>
 
-        {/* - Google Sign-In */}
-        <Button className="google-btn" icon={<GoogleOutlined />} onClick={handleGoogleSignIn}>
-          Sign in with Google
-        </Button>
+          {/* - Google Sign-In */}
+          <Col span={24} style={{ textAlign: "center", marginBottom: 16 }}>
+            <Button
+              type="primary"
+              icon={<GoogleOutlined />}
+              size="large"
+              style={{
+                background: "#1890ff",
+                borderColor: "#1890ff",
+                color: "#fff",
+                width: "100%",
+                borderRadius: 8,
+              }}
+              onClick={handleGoogleSignIn}
+            >
+              Sign in with Google
+            </Button>
+          </Col>
 
-        {/* - Navigate Back */}
-        <Button className="back-btn" icon={<QrcodeOutlined />} onClick={() => navigate("/login")}>
-          Back to Main Login
-        </Button>
+          {/* - Navigate Back */}
+          <Col span={24} style={{ textAlign: "center" }}>
+            <Button
+              icon={<QrcodeOutlined />}
+              size="large"
+              style={{
+                background: "#e6f7ff",
+                borderColor: "#e6f7ff",
+                color: "#1890ff",
+                width: "100%",
+                borderRadius: 8,
+              }}
+              onClick={() => navigate("/login")}
+            >
+              Back to Main Login
+            </Button>
+          </Col>
+        </Row>
       </Card>
     </div>
   );

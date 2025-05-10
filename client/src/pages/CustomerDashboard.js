@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Table, Select, Card, message, Input, Layout, Menu } from "antd";
+import { Table, Select, Card, Typography, Layout, Menu, Row, Col, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { LogoutOutlined, HomeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 
 const { Option } = Select;
-const { Header, Sider, Content } = Layout;
+const { Sider, Content } = Layout;
+const { Title, Text } = Typography;
 
 const CustomerDashboard = () => {
   const [orders, setOrders] = useState([]);
@@ -41,7 +42,7 @@ const CustomerDashboard = () => {
       console.log(`- Fetching orders for Customer ID: ${customerId}`); // - Debugging
 
       const { data } = await axios.get(
-        `http://localhost:8080/api/users/${customerId}/orders`
+        `api/users/${customerId}/orders`
       );
       setOrders(data);
     } catch (error) {
@@ -63,7 +64,7 @@ const CustomerDashboard = () => {
       console.log(`- Fetching loyalty points for: ${user._id}`);
 
       const { data } = await axios.get(
-        `http://localhost:8080/api/users/${user._id}/loyalty-points`
+        `api/users/${user._id}/loyalty-points`
       );
 
       setLoyaltyPoints(data.loyaltyPoints);
@@ -119,7 +120,7 @@ const CustomerDashboard = () => {
 
   return (
     <Layout>
-      <Sider theme="dark">
+      <Sider theme="dark" breakpoint="md" collapsedWidth="0">
         <div className="logo">Customer Panel</div>
         <Menu theme="dark" mode="inline">
           <Menu.Item key="home" icon={<HomeOutlined />} onClick={handleHomeNavigation}>
@@ -131,47 +132,34 @@ const CustomerDashboard = () => {
         </Menu>
       </Sider>
       <Layout>
-        {/* <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
-          <h2>Welcome, {user?.name || "Customer"}</h2>
-        </Header> */}
         <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
-          <h2>Customer Dashboard</h2>
+          <Title level={2} className="dashboard-header">Customer Dashboard</Title>
 
-          {/* Loyalty Points Display */}
-          <Card title="Loyalty Points" style={{ width: 300, marginBottom: 20 }}>
-            <h3>{loyaltyPoints} Points</h3>
-          </Card>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={8}>
+              <Card title="Loyalty Points" className="loyalty-card">
+                <Text strong>{loyaltyPoints} Points</Text>
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={16}>
+              <div className="filters">
+                <Select value={sortOption} onChange={handleSort} style={{ width: "100%", marginBottom: "10px" }}>
+                  <Option value="newest">Sort: Newest First</Option>
+                  <Option value="oldest">Sort: Oldest First</Option>
+                  <Option value="high-to-low">Sort: High to Low Amount</Option>
+                  <Option value="low-to-high">Sort: Low to High Amount</Option>
+                </Select>
+                <Select value={paymentFilter} onChange={handleFilter} style={{ width: "100%" }}>
+                  <Option value="all">Filter: All Payments</Option>
+                  <Option value="cash">Cash</Option>
+                  <Option value="cheque">Cheque</Option>
+                  <Option value="loyalty points">Loyalty Points</Option>
+                  <Option value="UPI">UPI</Option>
+                </Select>
+              </div>
+            </Col>
+          </Row>
 
-          {/* Sorting & Filtering Options */}
-          <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
-            <Select value={sortOption} onChange={handleSort} style={{ width: 200 }}>
-              <Option value="newest">Sort: Newest First</Option>
-              <Option value="oldest">Sort: Oldest First</Option>
-              <Option value="high-to-low">Sort: High to Low Amount</Option>
-              <Option value="low-to-high">Sort: Low to High Amount</Option>
-            </Select>
-
-            <Select
-              value={paymentFilter}
-              onChange={handleFilter}
-              style={{ width: 200 }}
-            >
-              <Option value="all">Filter: All Payments</Option>
-              <Option value="cash">Cash</Option>
-              <Option value="cheque">Cheque</Option>
-              <Option value="loyalty points">Loyalty Points</Option>
-              <Option value="UPI">UPI</Option>
-            </Select>
-
-            {/* <Input
-              placeholder="Search Orders"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: 200 }}
-            /> */}
-          </div>
-
-          {/* Orders Table */}
           <Table
             dataSource={displayedOrders}
             columns={[
@@ -179,24 +167,28 @@ const CustomerDashboard = () => {
                 title: "Date",
                 dataIndex: "createdAt",
                 render: (date) => new Date(date).toLocaleString(),
+                responsive: ["xs", "sm", "md", "lg"],
               },
               {
                 title: "Total Amount",
                 dataIndex: "totalAmount",
-                render: (amount) => (
-                  <span>&#8377;{amount.toFixed(2)}</span>
-                ),
+                render: (amount) => <span>&#8377;{amount.toFixed(2)}</span>,
+                responsive: ["xs", "sm", "md", "lg"],
               },
-              { title: "Payment Method", dataIndex: "paymentMethod" },
+              { 
+                title: "Payment Method", 
+                dataIndex: "paymentMethod",
+                responsive: ["sm", "md", "lg"],
+              },
               {
                 title: "Receipt",
-                dataIndex: "_id", // - Use bill ID to link to receipt
-                render: (billId) => (
-                  <Link to={`/receipt/${billId}`}>🧾 View Receipt</Link>
-                ),
+                dataIndex: "_id",
+                render: (billId) => <Link to={`/receipt/${billId}`}>🧾 View Receipt</Link>,
+                responsive: ["xs", "sm", "md", "lg"],
               },
             ]}
             rowKey="_id"
+            scroll={{ x: 600 }}
           />
         </Content>
       </Layout>

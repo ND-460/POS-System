@@ -19,7 +19,7 @@ const AdminManageCategories = () => {
   // Load categories
   const loadCategories = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8080/api/categories");
+      const { data } = await axios.get("api/categories");
       setCategories(data);
     } catch (error) {
       message.error("Failed to load categories");
@@ -33,7 +33,7 @@ const AdminManageCategories = () => {
       return;
     }
     try {
-      await axios.post("http://localhost:8080/api/categories/add", 
+      await axios.post("api/categories/add", 
         { name: newCategory.trim() }, // -Ensure correct body format
         { headers: { "Content-Type": "application/json" } } // -Ensure JSON content type
       );
@@ -53,7 +53,7 @@ const AdminManageCategories = () => {
       return;
     }
     try {
-      await axios.put(`http://localhost:8080/api/categories/${id}`, { name: updatedName.trim() });
+      await axios.put(`api/categories/${id}`, { name: updatedName.trim() });
       message.success("Category updated successfully!");
       setEditingCategory(null);
       loadCategories();
@@ -65,7 +65,7 @@ const AdminManageCategories = () => {
   // Delete category
   const deleteCategory = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/categories/${id}`);
+      await axios.delete(`api/categories/${id}`);
       message.success("Category deleted successfully!");
       loadCategories();
     } catch (error) {
@@ -143,13 +143,13 @@ const AdminManageCategories = () => {
                   </>
                 ) : (
                   <>
-                    <Button onClick={() => {
+                    <Button size="small" onClick={() => {
                       setEditingCategory(record._id);
                       setUpdatedName(record.name);
                     }}>
                       Edit
                     </Button>
-                    <Button type="danger" onClick={() => deleteCategory(record._id)}>
+                    <Button size="small" type="danger" onClick={() => deleteCategory(record._id)}>
                       Delete
                     </Button>
                   </>
@@ -159,6 +159,7 @@ const AdminManageCategories = () => {
           },
         ]}
         rowKey="_id"
+        size="small"
       />
     </div>
   );

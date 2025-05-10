@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Input, message, Modal, Form, Select } from "antd";
+import { Table, Button, Input, message, Modal, Form, Select, Row, Col } from "antd";
 
 import axios from "axios";
 
@@ -12,6 +12,8 @@ const AdminManageCashiers = () => {
   const [form] = Form.useForm();
   const [sortOption, setSortOption] = useState("name-asc");
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingCashierId, setEditingCashierId] = useState(null);
+  const [updatedCashier, setUpdatedCashier] = useState({});
 
   useEffect(() => {
     loadCashiers();
@@ -20,7 +22,7 @@ const AdminManageCashiers = () => {
   // -Fetch Cashiers
   const loadCashiers = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8080/api/users/cashiers");
+      const { data } = await axios.get("api/users/cashiers");
       console.log("- Cashiers Loaded:", data); // Log fetched data
       setCashiers(data);
     } catch (error) {
@@ -58,7 +60,7 @@ const AdminManageCashiers = () => {
   const handleSave = async (values) => {
     try {
       if (editingCashier) {
-        await axios.put(`http://localhost:8080/api/users/cashiers/${editingCashier}`, values);
+        await axios.put(`api/users/cashiers/${editingCashier}`, values);
         message.success("Cashier updated successfully!");
         setCashiers((prevCashiers) =>
           prevCashiers.map((cashier) =>
@@ -66,7 +68,7 @@ const AdminManageCashiers = () => {
           )
         );
       } else {
-        const { data } = await axios.post("http://localhost:8080/api/users/register", {
+        const { data } = await axios.post("api/users/register", {
           ...values,
           role: "cashier", // Ensure role is set to cashier
         });
@@ -86,7 +88,7 @@ const AdminManageCashiers = () => {
   const handleDelete = async (cashierId) => {
     try {
       console.log(` Deleting Cashier ID: ${cashierId}`);
-      await axios.delete(`http://localhost:8080/api/users/cashiers/${cashierId}`);
+      await axios.delete(`api/users/cashiers/${cashierId}`);
       message.success("Cashier deleted successfully!");
   
       //  Remove cashier from UI after deletion
@@ -119,6 +121,22 @@ const AdminManageCashiers = () => {
       cashier.mobile.includes(searchTerm)
   );
 
+  const handleInlineEdit = (record) => {
+    setEditingCashierId(record._id);
+    setUpdatedCashier(record);
+  };
+
+  const saveInlineEdit = async (id) => {
+    try {
+      await axios.put(`api/users/cashiers/${id}`, updatedCashier);
+      message.success("Cashier updated successfully!");
+      setEditingCashierId(null);
+      loadCashiers();
+    } catch (error) {
+      message.error("Error updating cashier");
+    }
+  };
+
   return (
     <div>
       <h2>Manage Cashiers</h2>
@@ -141,25 +159,69 @@ const AdminManageCashiers = () => {
         />
       </div>
 
-      <Table
-        dataSource={filteredCashiers}
-        columns={[
-          { title: "Name", dataIndex: "name" },
-          { title: "Email", dataIndex: "email" },
-          { title: "Mobile", dataIndex: "mobile" },
-          { title: "Role", dataIndex: "role" },
-          {
-            title: "Actions",
-            render: (_, record) => (
-              <>
-                <Button onClick={() => handleEdit(record)}>Edit</Button>
-                <Button type="danger" onClick={() => handleDelete(record._id)}>Delete</Button>
-              </>
-            ),
-          },
-        ]}
-        rowKey="_id"
-      />
+      <div style={{ overflowX: "auto" }}>
+        <Table
+          dataSource={filteredCashiers}
+          columns={[
+            {
+              title: "Name",
+              dataIndex: "name",
+              key: "name",
+              render: (_, record) =>
+                editingCashierId === record._id ? (
+                  <Input
+                    value={updatedCashier.name}
+                    onChange={(e) => setUpdatedCashier({ ...updatedCashier, name: e.target.value })}
+                  />
+                ) : (
+                  record.name
+                ),
+            },
+            {
+              title: "Email",
+              dataIndex: "email",
+              key: "email",
+              render: (_, record) =>
+                editingCashierId === record._id ? (
+                  <Input
+                    value={updatedCashier.email}
+                    onChange={(e) => setUpdatedCashier({ ...updatedCashier, email: e.target.value })}
+                  />
+                ) : (
+                  record.email
+                ),
+            },
+            { title: "Mobile", dataIndex: "mobile", key: "mobile" },
+            { title: "Role", dataIndex: "role", key: "role" },
+            {
+              title: "Action",
+              key: "action",
+              render: (_, record) =>
+                editingCashierId === record._id ? (
+                  <>
+                    <Button size="small" type="primary" onClick={() => saveInlineEdit(record._id)}>
+                      Save
+                    </Button>
+                    <Button size="small" onClick={() => setEditingCashierId(null)}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button size="small" onClick={() => handleInlineEdit(record)}>
+                      Edit
+                    </Button>
+                    <Button size="small" type="danger" onClick={() => handleDelete(record._id)}>
+                      Delete
+                    </Button>
+                  </>
+                ),
+            },
+          ]}
+          rowKey="_id"
+          size="small"
+        />
+      </div>
 
       {/* -Modal for Adding/Editing Cashier */}
       <Modal
@@ -171,37 +233,48 @@ const AdminManageCashiers = () => {
   }}
   footer={null}
 >
-
-        <Form form={form} onFinish={handleSave} layout="vertical">
-
-          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-            <Input />
+  <Form form={form} onFinish={handleSave} layout="vertical">
+    <Row gutter={[16, 16]}>
+      <Col xs={24}>
+        <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+      </Col>
+      <Col xs={24}>
+        <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
+          <Input />
+        </Form.Item>
+      </Col>
+      <Col xs={24}>
+        <Form.Item name="mobile" label="Mobile" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+      </Col>
+      <Col xs={24}>
+        <Form.Item name="birthdate" label="Birthdate">
+          <Input type="date" />
+        </Form.Item>
+      </Col>
+      <Col xs={24}>
+        <Form.Item name="role" label="Role" rules={[{ required: true }]}>
+          <Select>
+            <Option value="cashier">Cashier</Option>
+          </Select>
+        </Form.Item>
+      </Col>
+      {!editingCashier && (
+        <Col xs={24}>
+          <Form.Item name="password" label="Password" rules={[{ required: true }]}>
+            <Input.Password />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="mobile" label="Mobile" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="birthdate" label="Birthdate">
-            <Input type="date" />
-          </Form.Item>
-          <Form.Item name="role" label="Role" rules={[{ required: true }]}>
-            <Select>
-              <Option value="cashier">Cashier</Option>
-              {/* <Option value="admin">Admin</Option> -Allow role change */}
-            </Select>
-          </Form.Item>
-          {!editingCashier && (
-            <Form.Item name="password" label="Password" rules={[{ required: true }]}>
-              <Input.Password />
-            </Form.Item>
-          )}
-          <Button type="primary" htmlType="submit">
-            {editingCashier ? "Update Cashier" : "Add Cashier"}
-          </Button>
-        </Form>
-      </Modal>
+        </Col>
+      )}
+    </Row>
+    <Button type="primary" htmlType="submit">
+      {editingCashier ? "Update Cashier" : "Add Cashier"}
+    </Button>
+  </Form>
+</Modal>
     </div>
   );
 };

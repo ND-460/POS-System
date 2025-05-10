@@ -16,4 +16,9 @@ const itemSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+itemSchema.pre("save", function (next) {
+  console.log("Saving Item Document:", this); // Debugging log
+  next();
+});
+
 module.exports = mongoose.model("Item", itemSchema);
