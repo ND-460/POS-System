@@ -23,6 +23,9 @@ const corsOptions = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   allowedHeaders: "Content-Type,Authorization"
 };
+
+app.use('/media',express.static('client/public'))
+
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
