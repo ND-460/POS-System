@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Bill = require("../models/billsModel");
 const { completeTransaction } = require("../controllers/billsController");
+
 router.post("/", async (req, res) => {
   try {
     const { cashier, items, totalAmount, paymentMethod } = req.body;
@@ -31,22 +32,30 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/complete", completeTransaction);
+router.post("/complete", async (req, res) => {
+  try {
+    console.log("- Processing /complete route");
+    await completeTransaction(req, res);
+  } catch (error) {
+    console.error("- Error in /complete route:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 router.get("/:billId", async (req, res) => {
   try {
-    console.log(`-Fetching Bill ID: ${req.params.billId}`);
+    console.log(`- Fetching Bill ID: ${req.params.billId}`);
     const bill = await Bill.findById(req.params.billId)
       .populate("cashier", "name")
-      .populate("customer", "name")
-      .populate("items.item", "name");
-    
+      .populate("customer", "name loyaltyPoints")
+      .populate("items.item", "name price");
+
     if (!bill) {
       console.log("- Bill not found");
       return res.status(404).json({ message: "Bill not found" });
     }
 
-    console.log("-Sending Bill Data:", bill);
+    console.log("- Sending Bill Data:", bill);
     res.json(bill);
   } catch (error) {
     console.error("- Error fetching bill:", error);

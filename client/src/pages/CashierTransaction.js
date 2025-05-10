@@ -141,18 +141,20 @@ const CashierTransaction = () => {
 
     try {
       const cashier = JSON.parse(localStorage.getItem("auth"))?.user?._id;
+      if (!cashier) {
+        throw new Error("Cashier ID is missing");
+      }
+
       const transaction = {
         customer: customer || null,
         cashier,
-        items: cart.map(({ _id, quantity, price }) => ({
+        items: cart.map(({ _id, quantity }) => ({
           item: _id,
           quantity,
-          price,
         })),
         totalAmount: calculateTotalWithDiscount(),
         paymentMethod,
-        eventDiscount: activeEvent ? activeEvent.discount : 0,
-        eventTitle: activeEvent ? activeEvent.title : null,
+        taxAmount: calculateTotalWithDiscount() * 0.1, // Example tax calculation
       };
 
       const response = await axios.post("api/bills/complete", transaction);
@@ -161,14 +163,13 @@ const CashierTransaction = () => {
         message.success("Transaction completed!");
         setCart([]);
         localStorage.removeItem("cart");
-
-        // Navigate to the receipt page with the generated bill ID
         navigate(`/receipt/${response.data.billId}`);
       } else {
-        message.error("Transaction failed!");
+        throw new Error("Transaction failed");
       }
     } catch (error) {
-      message.error("Transaction failed!");
+      console.error("- Transaction Error:", error);
+      message.error(error.response?.data?.message || "Transaction failed!");
     } finally {
       setLoading(false);
     }

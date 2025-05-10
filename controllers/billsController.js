@@ -9,9 +9,10 @@ exports.completeTransaction = async (req, res) => {
 
     let { customer, cashier, items, totalAmount, paymentMethod, taxAmount } = req.body;
 
-    if (!cashier || !items || !totalAmount || !paymentMethod) {
-      console.log("- Missing required fields!");
-      return res.status(400).json({ message: "Missing required fields" });
+    // Validate required fields
+    if (!cashier || !items || !Array.isArray(items) || items.length === 0 || !totalAmount || !paymentMethod) {
+      console.log("- Missing or invalid required fields!");
+      return res.status(400).json({ message: "Missing or invalid required fields" });
     }
     if (!taxAmount) {
       taxAmount = 0;
@@ -142,19 +143,21 @@ exports.completeTransaction = async (req, res) => {
     });
     await bill.save();
 
-    console.log("-Transaction Successful:", bill);
+    console.log("- Transaction Successful:", bill);
     return res.status(201).json({
       message: "Transaction completed successfully!",
       billId: bill._id,
       bill: {
         _id: bill._id,
         createdAt: bill.createdAt,
+        customer,
         customerName: customerData ? customerData.name : "Guest",
         cashier,
         cashierName,
         items: itemsWithNames,
         totalAmount: discountedTotalAmount,
         paymentMethod,
+        taxAmount,
         loyaltyPointsUsed,
       },
     });
