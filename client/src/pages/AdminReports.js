@@ -136,7 +136,13 @@ const AdminReports = () => {
   return (
     <div>
       <h2>Reports</h2>
-      <Space style={{ marginBottom: 16 }}>
+      <Space
+        style={{
+          marginBottom: 16,
+          flexWrap: "wrap", // Allow wrapping for responsiveness
+          gap: "8px", // Add spacing between buttons
+        }}
+      >
         <Button
           type={activeReport === "sales" ? "primary" : "default"}
           onClick={() => setActiveReport("sales")}
@@ -158,18 +164,26 @@ const AdminReports = () => {
       </Space>
       {activeReport === "sales" && (
         <>
-          <RangePicker
-            style={{ marginBottom: 16 }}
-            onChange={(dates) => setDateRange(dates)}
-          />
-          <Button
-            type="primary"
-            onClick={() => fetchReports()}
-            loading={loading}
-            style={{ marginLeft: 8 }}
+          <Space
+            style={{
+              marginBottom: 16,
+              flexWrap: "wrap", // Allow wrapping for responsiveness
+              gap: "8px", // Add spacing between elements
+            }}
           >
-            Refresh
-          </Button>
+            <RangePicker
+              style={{ flex: "1 1 auto", minWidth: "250px" }} // Adjust width for responsiveness
+              onChange={(dates) => setDateRange(dates)}
+            />
+            <Button
+              type="primary"
+              onClick={() => fetchReports()}
+              loading={loading}
+              style={{ flex: "0 0 auto" }} // Prevent button from stretching
+            >
+              Refresh
+            </Button>
+          </Space>
           <Table
             dataSource={reports}
             columns={[
@@ -191,25 +205,62 @@ const AdminReports = () => {
         </>
       )}
       {activeReport === "inventory" && (
-        <Table
-          dataSource={inventoryReports}
-          columns={inventoryColumns}
-          rowKey="_id"
-          loading={loading}
-          style={{ marginTop: 16 }}
-        />
+        <div style={{ overflowX: "auto" }}> {/* Add horizontal scrolling */}
+          <Table
+            dataSource={inventoryReports}
+            columns={inventoryColumns}
+            rowKey="_id"
+            loading={loading}
+            size="small"
+            scroll={{ x: 600 }} // Enable horizontal scrolling for the table
+            style={{ marginTop: 16 }}
+          />
+        </div>
       )}
       {activeReport === "charts" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "20px" }}>
-            <div style={{ flex: 1, maxWidth: "45%", height: "400px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "40px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap", // Allow wrapping for responsiveness
+              justifyContent: "space-between",
+              gap: "20px",
+            }}
+          >
+            <div
+              style={{
+                flex: "1 1 100%",
+                maxWidth: "100%",
+                height: "400px",
+                minWidth: "300px", // Ensure minimum width for smaller screens
+              }}
+            >
               <CategorySalesChart />
             </div>
-            <div style={{ flex: 1, maxWidth: "45%", height: "400px" }}>
+            <div
+              style={{
+                flex: "1 1 100%",
+                maxWidth: "100%",
+                height: "400px",
+                minWidth: "300px", // Ensure minimum width for smaller screens
+              }}
+            >
               <MostSoldItemsChart />
             </div>
           </div>
-          <div style={{ height: "400px", marginTop: "20px" }}>
+          <div
+            style={{
+              height: "400px",
+              marginTop: "20px",
+              minWidth: "300px", // Ensure minimum width for smaller screens
+            }}
+          >
             <MonthlyRevenueChart />
           </div>
         </div>

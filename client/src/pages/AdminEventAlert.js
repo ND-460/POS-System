@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Input, InputNumber, Form, DatePicker, Select, message, Row, Col } from "antd";
+import { Table, Button, Input, InputNumber, Form, DatePicker, Select, message, Row, Col, Modal } from "antd";
 import axios from "axios";
-import moment from "moment"; // Import moment
+import moment from "moment";
 
 const { Option } = Select;
 
@@ -11,6 +11,7 @@ const AdminEventAlert = () => {
   const [categories, setCategories] = useState([]);
   const [form] = Form.useForm();
   const [editingEvent, setEditingEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +20,6 @@ const AdminEventAlert = () => {
     loadCategories();
   }, []);
 
-  // Load events from backend
   const loadEvents = async () => {
     try {
       const { data } = await axios.get("/api/events");
@@ -31,7 +31,6 @@ const AdminEventAlert = () => {
     }
   };
 
-  // Load items from backend
   const loadItems = async () => {
     try {
       const { data } = await axios.get("/api/items");
@@ -42,7 +41,6 @@ const AdminEventAlert = () => {
     }
   };
 
-  // Load categories from backend
   const loadCategories = async () => {
     try {
       const { data } = await axios.get("/api/categories");
@@ -53,7 +51,6 @@ const AdminEventAlert = () => {
     }
   };
 
-  // Add or update event
   const handleSubmit = async (values) => {
     try {
       const payload = {
@@ -67,7 +64,6 @@ const AdminEventAlert = () => {
       }
 
       if (editingEvent) {
-        // Ensure the correct endpoint is used
         await axios.put(`/api/events/${editingEvent}`, payload);
         message.success("Event updated successfully!");
         setEvents((prevEvents) =>
@@ -82,13 +78,13 @@ const AdminEventAlert = () => {
         setEvents((prevEvents) => [...prevEvents, data.event]);
       }
       form.resetFields();
+      setIsModalOpen(false); // Close modal after submission
     } catch (error) {
       console.error("Error saving event:", error.response?.data || error.message);
       message.error(error.response?.data?.message || "Error saving event");
     }
   };
 
-  // Delete event
   const handleDelete = async (id) => {
     try {
       await axios.delete(`/api/events/${id}`);
@@ -104,26 +100,103 @@ const AdminEventAlert = () => {
     }
   };
 
-  // Set event for editing
   const handleEdit = (event) => {
     setEditingEvent(event._id);
+    setIsModalOpen(true);
 
-    // Convert date to a moment object for DatePicker
     const formValues = {
       ...event,
-      date: event.date ? moment(event.date) : null, // Ensure date is a moment object
-      categories: event.categories || [], // Ensure categories is an array
-      items: event.items?.map((item) => item._id) || [], // Map items to their IDs
+      date: event.date ? moment(event.date) : null,
+      categories: event.categories || [],
+      items: event.items?.map((item) => item._id) || [],
     };
 
     form.setFieldsValue(formValues);
   };
 
+  const handleAddEvent = () => {
+    setEditingEvent(null);
+    form.resetFields();
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    form.resetFields();
+  };
+
   return (
     <div>
-      {/* Event Form */}
-      <div style={{ border: "1px solid #ccc", padding: "16px", marginBottom: "16px", borderRadius: "8px" }}>
+      <div style={{ padding: "16px", marginBottom: "16px" }}>
         <h2>Manage Events</h2>
+        <Button type="primary" onClick={handleAddEvent} style={{ marginBottom: "16px" }}>
+          Add Event
+        </Button>
+      </div>
+
+      <div style={{ padding: "16px" }}>
+        <h2>Event List</h2>
+        <Table
+          dataSource={events}
+          columns={[
+            { title: "Title", dataIndex: "title", render: (text) => <span style={{ fontSize: "14px" }}>{text}</span> },
+            { title: "Description", dataIndex: "description", render: (text) => <span style={{ fontSize: "14px" }}>{text}</span> },
+            { title: "Discount (%)", dataIndex: "discount", render: (text) => <span style={{ fontSize: "14px" }}>{text}</span> },
+            {
+              title: "Date",
+              dataIndex: "date",
+              render: (text) => (
+                <span style={{ fontSize: "14px" }}>
+                  {text ? new Date(text).toLocaleDateString() : "N/A"}
+                </span>
+              ),
+            },
+            {
+              title: "Categories",
+              dataIndex: "categories",
+              render: (categories) => (
+                <span style={{ fontSize: "14px" }}>{categories?.join(", ") || "N/A"}</span>
+              ),
+            },
+            {
+              title: "Items",
+              dataIndex: "items",
+              render: (items) => <span style={{ fontSize: "14px" }}>{items?.length || "N/A"}</span>,
+            },
+            {
+              title: "Action",
+              render: (_, record) => (
+                <>
+                  <Button size="small" onClick={() => handleEdit(record)} style={{ fontSize: "12px" }}>
+                    Edit
+                  </Button>
+                  <Button
+                    size="small"
+                    type="danger"
+                    onClick={() => handleDelete(record._id)}
+                    style={{ fontSize: "12px" }}
+                  >
+                    Delete
+                  </Button>
+                </>
+              ),
+            },
+          ]}
+          rowKey="_id"
+          loading={loading}
+          scroll={{ x: 600 }}
+          size="middle" // Adjust table size for better visibility
+          style={{ fontSize: "14px" }} // Adjust overall font size
+        />
+      </div>
+
+      {/* Modal for Adding/Editing Event */}
+      <Modal
+        title={editingEvent ? "Edit Event" : "Add Event"}
+        open={isModalOpen}
+        onCancel={closeModal}
+        footer={null}
+      >
         <Form form={form} onFinish={handleSubmit} layout="vertical">
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12}>
@@ -150,7 +223,7 @@ const AdminEventAlert = () => {
               <Form.Item name="categories" label="Categories">
                 <Select mode="multiple" placeholder="Select categories">
                   {categories.map((category) => (
-                    <Option key={category._id} value={category._id}> {/* Use category ID */}
+                    <Option key={category._id} value={category._id}>
                       {category.name}
                     </Option>
                   ))}
@@ -161,7 +234,7 @@ const AdminEventAlert = () => {
               <Form.Item name="items" label="Items">
                 <Select mode="multiple" placeholder="Select items">
                   {items.map((item) => (
-                    <Option key={item._id} value={item._id}> {/* Use item ID */}
+                    <Option key={item._id} value={item._id}>
                       {item.name}
                     </Option>
                   ))}
@@ -173,50 +246,7 @@ const AdminEventAlert = () => {
             {editingEvent ? "Update Event" : "Add Event"}
           </Button>
         </Form>
-      </div>
-
-      {/* Event List Table */}
-      <div style={{ border: "1px solid #ccc", padding: "16px", borderRadius: "8px" }}>
-        <h2>Event List</h2>
-        <Table
-          dataSource={events}
-          columns={[
-            { title: "Title", dataIndex: "title" },
-            { title: "Description", dataIndex: "description" },
-            { title: "Discount (%)", dataIndex: "discount" },
-            {
-              title: "Date",
-              dataIndex: "date",
-              render: (text) => (text ? new Date(text).toLocaleDateString() : "N/A"),
-            },
-            {
-              title: "Categories",
-              dataIndex: "categories",
-              render: (categories) => categories?.join(", ") || "N/A",
-            },
-            {
-              title: "Items",
-              dataIndex: "items",
-              render: (items) => items?.length || "N/A",
-            },
-            {
-              title: "Action",
-              render: (_, record) => (
-                <>
-                  <Button size="small" onClick={() => handleEdit(record)}>Edit</Button>
-                  <Button size="small" type="danger" onClick={() => handleDelete(record._id)}>
-                    Delete
-                  </Button>
-                </>
-              ),
-            },
-          ]}
-          rowKey="_id"
-          loading={loading}
-          scroll={{ x: 600 }}
-          size="small"
-        />
-      </div>
+      </Modal>
     </div>
   );
 };
