@@ -1,3 +1,10 @@
+html, body {
+  background: #101522 !important;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
 /* General Styling */
 .homepage {
     font-family: Arial, sans-serif;
