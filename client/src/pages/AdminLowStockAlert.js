@@ -55,10 +55,17 @@ const AdminLowStockAlert = () => {
       />
       <Table
         dataSource={lowStockItems}
-        columns={columns}
+        columns={[
+          { title: "Item Name", dataIndex: "name" },
+          { title: "Category", dataIndex: "category" },
+          { title: "Stock", dataIndex: "stock" },
+          { title: "Low Stock Alert Threshold", dataIndex: "lowStockAlert" },
+        ]}
         rowKey="_id"
         loading={loading}
         pagination={{ pageSize: 10 }}
+        scroll={{ x: 600 }}
+        size="small"
       />
     </div>
   );

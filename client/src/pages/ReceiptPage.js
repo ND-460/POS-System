@@ -19,13 +19,13 @@ const ReceiptPage = () => {
 
       try {
         console.log(`-Fetching bill with ID: ${billId}`);
-        const { data } = await axios.get(`http://localhost:8080/api/bills/${billId}`);
+        const { data } = await axios.get(`api/bills/${billId}`);
         console.log("-Bill Fetched:", data);
 
         // Ensure customerName is set correctly
         if (!data.customerName && data.customer) {
           try {
-            const customerResponse = await axios.get(`http://localhost:8080/api/users/customers/${data.customer}`);
+            const customerResponse = await axios.get(`api/users/customers/${data.customer}`);
             data.customerName = customerResponse.data?.name || "Guest";
           } catch (error) {
             console.warn("- Customer not found, defaulting to Guest");

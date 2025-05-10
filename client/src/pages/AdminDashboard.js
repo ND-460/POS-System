@@ -5,20 +5,19 @@ import {
   UnorderedListOutlined,
   UserOutlined,
   LogoutOutlined,
-  HomeOutlined, 
   AlertOutlined,
-  MessageOutlined
+  MessageOutlined,
 } from "@ant-design/icons";
 import AdminManageItems from "./AdminManageItem";
 import AdminManageCategories from "./AdminManageCategories";
 import AdminManageCashiers from "./AdminManageCashiers";
 import AdminReports from "./AdminReports";
-import AdminLowStockAlert from "./AdminLowStockAlert";  
+import AdminLowStockAlert from "./AdminLowStockAlert";
 import AdminEventAlert from "./AdminEventAlert";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-const { Header, Sider, Content } = Layout;
+const { Sider, Content } = Layout;
 
 const AdminDashboard = () => {
   const [selectedSection, setSelectedSection] = useState("items");
@@ -44,7 +43,7 @@ const AdminDashboard = () => {
 
   return (
     <Layout>
-      <Sider collapsible>
+      <Sider collapsible breakpoint="md" collapsedWidth="0">
         <div className="logo">Admin Panel</div>
         <Menu
           theme="dark"
@@ -58,9 +57,6 @@ const AdminDashboard = () => {
             }
           }}
         >
-          {/* <Menu.Item key="home" icon={<HomeOutlined />}>
-            Home
-          </Menu.Item> */}
           <Menu.Item key="items" icon={<UnorderedListOutlined />}>
             Manage Items
           </Menu.Item>
@@ -84,20 +80,18 @@ const AdminDashboard = () => {
           </Menu.Item>
         </Menu>
       </Sider>
-
-      {/* <Layout> */}
-        {/* <Header style={{ background: "#fff", padding: 10, textAlign: "center" }}>
-          <h2>Welcome, {user?.name || "Admin"}</h2>
-        </Header> */}
+      <Layout>
         <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
-          {selectedSection === "items" && <AdminManageItems />}
-          {selectedSection === "categories" && <AdminManageCategories />}
-          {selectedSection === "cashiers" && <AdminManageCashiers />}
-          {selectedSection === "reports" && <AdminReports />}
-          {selectedSection === "lowstock" && <AdminLowStockAlert />}
-          {selectedSection === "EventsMessage" && <AdminEventAlert />}
+          <div style={{ padding: "24px" }}>
+            {selectedSection === "items" && <AdminManageItems />}
+            {selectedSection === "categories" && <AdminManageCategories />}
+            {selectedSection === "cashiers" && <AdminManageCashiers />}
+            {selectedSection === "reports" && <AdminReports />}
+            {selectedSection === "lowstock" && <AdminLowStockAlert />}
+            {selectedSection === "EventsMessage" && <AdminEventAlert />}
+          </div>
         </Content>
-      {/* </Layout> */}
+      </Layout>
     </Layout>
   );
 };

@@ -172,8 +172,16 @@ const AdminReports = () => {
           </Button>
           <Table
             dataSource={reports}
-            columns={columns}
+            columns={[
+              { title: "Date", dataIndex: "createdAt", render: (text) => moment(text).format("YYYY-MM-DD") },
+              { title: "Cashier", dataIndex: "cashierName" },
+              { title: "Customer", dataIndex: "customerName", render: (text) => text || "Guest" },
+              { title: "Total Amount", dataIndex: "totalAmount", render: (amount) => `₹${amount.toFixed(2)}` },
+              { title: "Payment Method", dataIndex: "paymentMethod" },
+            ]}
             rowKey="_id"
+            size="small"
+            scroll={{ x: 600 }}
             loading={loading}
             style={{ marginTop: 16 }}
             onChange={(pagination, filters, sorter) => {

@@ -47,6 +47,11 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use((req, res, next) => {
+  console.log(`Incoming Request: ${req.method} ${req.url}`); // Debugging log
+  console.log("Request Body:", req.body); // Debugging log
+  next();
+});
 
 app.use("/api/categories", categoryRoutes);
 app.use("/api/reports", reportsRoute);

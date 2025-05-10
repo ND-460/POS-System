@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Form, Input, Button, DatePicker, message } from "antd";
+import { Form, Input, Button, DatePicker, message, Card, Typography, Divider } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/CustomerAuth.css"; // Custom styles
+
+const { Title, Text } = Typography;
 
 const CustomerAuth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -80,13 +82,13 @@ const CustomerAuth = () => {
 
   // Handle Google Sign-In
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/api/users/auth/google";
+    window.location.href = "api/users/auth/google";
   };
 
   return (
     <div className="customer-auth-container">
-      <div className="auth-card">
-        <h2>{isRegister ? "Register as a Customer" : "Customer Login"}</h2>
+      <Card className="auth-card" bordered={false}>
+        <Title level={3}>{isRegister ? "Register as a Customer" : "Customer Login"}</Title>
 
         <Form layout="vertical" form={form} onFinish={handleSubmit}>
           {isRegister && (
@@ -117,7 +119,7 @@ const CustomerAuth = () => {
             {isRegister ? "Register" : "Login"}
           </Button>
 
-          <div className="or-divider">OR</div>
+          <Divider>OR</Divider>
 
           {/* Google Sign-In Button */}
           <Button icon={<GoogleOutlined />} className="google-btn" onClick={handleGoogleLogin} block>
@@ -125,10 +127,10 @@ const CustomerAuth = () => {
           </Button>
         </Form>
 
-        <p className="toggle-text" onClick={() => setIsRegister(!isRegister)}>
+        <Text className="toggle-text" onClick={() => setIsRegister(!isRegister)}>
           {isRegister ? "Already have an account? Login" : "New here? Register now"}
-        </p>
-      </div>
+        </Text>
+      </Card>
     </div>
   );
 };

@@ -16,7 +16,7 @@ const Login = () => {
   const handleLogin = async (values) => {
     setLoading(true);
     try {
-      const { data } = await axios.post("http://localhost:8080/api/users/login", values);
+      const { data } = await axios.post("api/users/login", values);
       dispatch({ type: "LOGIN_SUCCESS", payload: data });
       message.success("Login successful!");
 

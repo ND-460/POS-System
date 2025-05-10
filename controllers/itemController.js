@@ -11,12 +11,14 @@ const getItemController = async (req, res) => {
 //add items
 const addItemController = async (req, res) => {
   try {
+    console.log("Request Body:", req.body); // Debugging log to check incoming data
     const newItem = new itemModel(req.body);
     await newItem.save();
+    console.log("Item Saved:", newItem); // Debugging log to confirm saving
     res.status(201).send("Item Created Successfully!");
   } catch (error) {
-    res.status(400).send("error", error);
-    console.log(error);
+    console.error("Error adding item:", error); // Debugging log for errors
+    res.status(400).send({ message: "Error adding item", error });
   }
 };
 //update item

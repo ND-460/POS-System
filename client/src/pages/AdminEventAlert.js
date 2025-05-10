@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Input, InputNumber, Form, DatePicker, Select, message } from "antd";
+import { Table, Button, Input, InputNumber, Form, DatePicker, Select, message, Row, Col } from "antd";
 import axios from "axios";
 import moment from "moment"; // Import moment
 
@@ -125,43 +125,50 @@ const AdminEventAlert = () => {
       <div style={{ border: "1px solid #ccc", padding: "16px", marginBottom: "16px", borderRadius: "8px" }}>
         <h2>Manage Events</h2>
         <Form form={form} onFinish={handleSubmit} layout="vertical">
-          <Form.Item name="title" label="Event Title" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="description" label="Description" rules={[{ required: true }]}>
-            <Input.TextArea rows={4} />
-          </Form.Item>
-
-          {/* Use InputNumber for Discount */}
-          <Form.Item name="discount" label="Discount (%)" rules={[{ required: true, type: "number", min: 1 }]}>
-            <InputNumber style={{ width: "100%" }} min={1} />
-          </Form.Item>
-
-          <Form.Item name="date" label="Event Date" rules={[{ required: true }]}>
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-
-          <Form.Item name="categories" label="Categories">
-            <Select mode="multiple" placeholder="Select categories">
-              {categories.map((category) => (
-                <Option key={category._id} value={category._id}> {/* Use category ID */}
-                  {category.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="items" label="Items">
-            <Select mode="multiple" placeholder="Select items">
-              {items.map((item) => (
-                <Option key={item._id} value={item._id}> {/* Use item ID */}
-                  {item.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12}>
+              <Form.Item name="title" label="Event Title" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="discount" label="Discount (%)" rules={[{ required: true, type: "number", min: 1 }]}>
+                <InputNumber style={{ width: "100%" }} min={1} />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item name="description" label="Description" rules={[{ required: true }]}>
+                <Input.TextArea rows={4} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="date" label="Event Date" rules={[{ required: true }]}>
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="categories" label="Categories">
+                <Select mode="multiple" placeholder="Select categories">
+                  {categories.map((category) => (
+                    <Option key={category._id} value={category._id}> {/* Use category ID */}
+                      {category.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item name="items" label="Items">
+                <Select mode="multiple" placeholder="Select items">
+                  {items.map((item) => (
+                    <Option key={item._id} value={item._id}> {/* Use item ID */}
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
           <Button type="primary" htmlType="submit">
             {editingEvent ? "Update Event" : "Add Event"}
           </Button>
@@ -196,8 +203,8 @@ const AdminEventAlert = () => {
               title: "Action",
               render: (_, record) => (
                 <>
-                  <Button onClick={() => handleEdit(record)}>Edit</Button>
-                  <Button type="danger" onClick={() => handleDelete(record._id)}>
+                  <Button size="small" onClick={() => handleEdit(record)}>Edit</Button>
+                  <Button size="small" type="danger" onClick={() => handleDelete(record._id)}>
                     Delete
                   </Button>
                 </>
@@ -206,6 +213,8 @@ const AdminEventAlert = () => {
           ]}
           rowKey="_id"
           loading={loading}
+          scroll={{ x: 600 }}
+          size="small"
         />
       </div>
     </div>
