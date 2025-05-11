@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button, Spin, message } from "antd";
 import axios from "axios";
+import html2pdf from "html2pdf.js"; // Import html2pdf.js
 import "../styles/InvoiceStyles.css";
 
 const ReceiptPage = () => {
@@ -61,6 +62,18 @@ const ReceiptPage = () => {
     const eventDiscountAmount = bill.event ? (item.originalPrice * bill.event.discount) / 100 : 0;
     return sum + itemDiscountAmount + eventDiscountAmount;
   }, 0) || 0;
+
+  const downloadPDF = () => {
+    const element = document.querySelector(".receipt-container"); // Select the receipt container
+    const options = {
+      margin: 1,
+      filename: `Receipt-${bill?._id || "N/A"}.pdf`,
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    };
+
+    html2pdf().set(options).from(element).save();
+  };
 
   return (
     <div className="receipt-container">
@@ -181,7 +194,7 @@ const ReceiptPage = () => {
 
       {/* Action Buttons */}
       <div className="button-container">
-        <Button type="primary" onClick={() => window.print()}>🖨 Print Again</Button>
+        <Button type="primary" onClick={downloadPDF}>📄 Download PDF</Button>
         <Button danger onClick={() => {
           const user = JSON.parse(localStorage.getItem("auth"));
           const redirectPath = user?.role === "customer" ? "/customer" : "/cashier";
