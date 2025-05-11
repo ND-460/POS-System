@@ -11,46 +11,41 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "api/users/auth/google/callback",
+      callbackURL: "http://localhost:8080/api/users/auth/google/callback", // Ensure this matches your backend route
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // console.log("- Full Google Profile Object:", JSON.stringify(profile, null, 2));
+        console.log("- Google Profile:", profile);
 
-        // - Extract email safely
-        const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
-
-        // console.log("- Extracted Email:", email);
+        const email = profile.emails?.[0]?.value || null;
 
         if (!email) {
           console.error("- Google Auth Error: No email received from Google");
           return done(null, false, { message: "No email received from Google" });
         }
 
-        // - Check if user exists in MongoDB
         let user = await User.findOne({ email });
 
         if (!user) {
           user = new User({
             name: profile.displayName || "No Name",
-            email: email, // - Now properly extracted
-            mobile: "N/A", // Default value since Google doesn't provide mobile
-            birthdate: new Date("2000-01-01"), // Default birthdate
-            password: "google-auth", // Placeholder password
+            email,
+            mobile: "N/A",
+            birthdate: new Date("2000-01-01"),
+            password: "google-auth",
             role: "customer",
             isVerified: true,
             loyaltyPoints: 0,
             pastOrders: [],
             specialDiscounts: [],
           });
-
           await user.save();
         }
 
         console.log("- Google Auth Successful:", user);
         return done(null, user);
       } catch (error) {
-        console.error("- Google Auth Database Error:", error);
+        console.error("- Google Auth Error:", error);
         return done(error, null);
       }
     }

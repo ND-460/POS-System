@@ -82,7 +82,9 @@ const CustomerAuth = () => {
 
   // Handle Google Sign-In
   const handleGoogleLogin = () => {
-    window.location.href = "api/users/auth/google";
+    const googleLoginUrl = "http://localhost:8080/api/users/auth/google"; // Ensure this matches your backend route
+    console.log("- Redirecting to Google Login:", googleLoginUrl);
+    window.location.href = googleLoginUrl;
   };
 
   return (

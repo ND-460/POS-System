@@ -70,36 +70,25 @@ const googleAuthCallback = async (req, res, next) => {
     if (err) {
       console.error("- Google Auth Error:", err);
       return res.redirect(
-        "http://localhost:3000/customer-auth?error=GoogleAuthFailed"
+        "http://localhost:3000/customer-auth?error=GoogleAuthFailed" // Ensure this matches your frontend route
       );
     }
     if (!user) {
       console.warn("- Google Auth Failed: No user found");
       return res.redirect(
-        "http://localhost:3000/customer-auth?error=GoogleAuthFailed"
+        "http://localhost:3000/customer-auth?error=GoogleAuthFailed" // Ensure this matches your frontend route
       );
-    }
-    // - Ensure user is saved in DB
-    const existingUser = await User.findOne({ email: user.email });
-    if (!existingUser) {
-      const newUser = new User({
-        name: user.name,
-        email: user.email,
-        role: "customer",
-        isVerified: true,
-      });
-      await newUser.save();
-      console.log("- New Google User Saved:", newUser);
     }
     req.login(user, (err) => {
       if (err) {
         console.error("- Error logging in user:", err);
         return res.redirect(
-          "http://localhost:3000/customer-auth?error=GoogleAuthFailed"
+          "http://localhost:3000/customer-auth?error=GoogleAuthFailed" // Ensure this matches your frontend route
         );
       }
+      console.log("- Redirecting to frontend with user ID:", user._id);
       return res.redirect(
-        `http://localhost:3000/customer-auth?googleSuccess=true&userId=${user._id}`
+        `http://localhost:3000/customer-auth?googleSuccess=true&userId=${user._id}` // Ensure this matches your frontend route
       );
     });
   })(req, res, next);
