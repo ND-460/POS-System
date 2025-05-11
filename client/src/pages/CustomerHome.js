@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout, Menu, Typography, Button, Card, Collapse, Row, Col, Divider, Image } from "antd";
 import { Link } from "react-router-dom";
 import {
@@ -112,6 +112,25 @@ const highlights = [
 const CustomerHome = () => {
   const [selectedFeature, setSelectedFeature] = useState(features[0]);
   const [selectedGuide, setSelectedGuide] = useState(guides[0]);
+  const [visibleSections, setVisibleSections] = useState({});
+
+  const handleScroll = () => {
+    const sections = document.querySelectorAll(".scroll-section");
+    const updatedVisibility = {};
+    sections.forEach((section) => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        updatedVisibility[section.id] = true;
+      }
+    });
+    setVisibleSections(updatedVisibility);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Trigger on mount
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
@@ -209,7 +228,22 @@ const CustomerHome = () => {
       {/* Main Content */}
       <Content style={{ marginTop: 80, background: "#f0f2f5" }}>
         {/* Hero Section */}
-        <div id = "homes"style={{ minHeight: 400, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "64px 16px 32px 16px", background: "#f0f2f5" }}>
+        <div
+          id="homes"
+          className="scroll-section"
+          style={{
+            minHeight: 400,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "64px 16px 32px 16px",
+            background: "#f0f2f5",
+            opacity: visibleSections.homes ? 1 : 0,
+            transform: visibleSections.homes ? "translateY(0)" : "translateY(50px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
           <Title style={{ color: "#1890ff", fontWeight: 800, fontSize: 40, textAlign: "center", marginBottom: 16 }}>
             Welcome to <span style={{ color: "#333" }}>Our POS System</span>
           </Title>
@@ -226,8 +260,64 @@ const CustomerHome = () => {
 
         <Divider style={{ margin: '0 auto', maxWidth: 800 }} />
 
+        {/* Responsive Section */}
+        <div
+          id="responsive"
+          className="scroll-section"
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "48px 16px",
+            textAlign: "center",
+            opacity: visibleSections.responsive ? 1 : 0,
+            transform: visibleSections.responsive ? "translateY(0)" : "translateY(50px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
+          <Title level={2} style={{ color: "#1890ff", fontWeight: 700, marginBottom: 24 }}>
+            Designed for All Devices
+          </Title>
+          <Text style={{ color: "#555", fontSize: "clamp(14px, 4vw, 16px)", lineHeight: 1.8, marginBottom: 24, display: "block" }}>
+            Our POS system is fully responsive, ensuring a seamless experience on both mobile and desktop devices. 
+            Whether you're on the go or at your desk, enjoy a consistent and intuitive interface.
+          </Text>
+          <Row gutter={[32, 32]} justify="center" align="middle">
+            <Col xs={24} md={12}>
+              <Image
+                src="/media/PcMobile.jpeg" // Replace with the actual image path
+                alt="Responsive Design"
+                width="100%"
+                style={{ objectFit: "cover", borderRadius: 16 }}
+                preview={false}
+              />
+            </Col>
+            <Col xs={24} md={12} style={{ textAlign: "left" }}>
+              <Title level={4} style={{ color: "#1890ff", marginBottom: 16 }}>
+                Seamless Experience
+              </Title>
+              <Text style={{ color: "#555", fontSize: "clamp(14px, 4vw, 16px)", lineHeight: 1.8 }}>
+                Our system adapts to any screen size, providing an optimized layout for mobile users and a comprehensive view for desktop users. 
+                Stay productive and efficient, no matter where you are.
+              </Text>
+            </Col>
+          </Row>
+        </div>
+
+        <Divider style={{ margin: '0 auto', maxWidth: 800 }} />
+
         {/* Features Section - Two Column Layout */}
-        <div id="features" style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 16px" }}>
+        <div
+          id="features"
+          className="scroll-section"
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "48px 16px",
+            opacity: visibleSections.features ? 1 : 0,
+            transform: visibleSections.features ? "translateY(0)" : "translateY(50px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
           <Title level={2} style={{ color: "#1890ff", textAlign: "center", fontWeight: 700, marginBottom: 40 }}>Why Choose Our POS System?</Title>
           <Row gutter={[32, 32]} justify="center" align="middle">
             {/* Left: Selected Feature Image */}
@@ -260,7 +350,18 @@ const CustomerHome = () => {
         <Divider style={{ margin: '0 auto', maxWidth: 800 }} />
 
         {/* Highlights Section */}
-        <div id="highlights" style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 16px" }}>
+        <div
+          id="highlights"
+          className="scroll-section"
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "48px 16px",
+            opacity: visibleSections.highlights ? 1 : 0,
+            transform: visibleSections.highlights ? "translateY(0)" : "translateY(50px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
           <Title level={2} style={{ color: "#1890ff", textAlign: "center", fontWeight: 700, marginBottom: 40 }}>
             Highlights
           </Title>
@@ -296,7 +397,18 @@ const CustomerHome = () => {
         <Divider style={{ margin: '0 auto', maxWidth: 800 }} />
 
         {/* POS System Guide - Two Column Layout */}
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 16px" }}>
+        <div
+          id="guide"
+          className="scroll-section"
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "32px 16px",
+            opacity: visibleSections.guide ? 1 : 0,
+            transform: visibleSections.guide ? "translateY(0)" : "translateY(50px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
           <Title level={2} style={{ color: "#1890ff", textAlign: "center", fontWeight: 700, marginBottom: 40 }}>How It Works?</Title>
           <Row gutter={[32, 32]} justify="center" align="middle">
             {/* Left: Selected Guide Image */}
@@ -329,7 +441,18 @@ const CustomerHome = () => {
         <Divider style={{ margin: '0 auto', maxWidth: 800 }} />
 
       {/* FAQ Section */}
-        <div id="faq" style={{ maxWidth: 800, margin: "0 auto", padding: "32px 16px" }}>
+        <div
+          id="faq"
+          className="scroll-section"
+          style={{
+            maxWidth: 800,
+            margin: "0 auto",
+            padding: "32px 16px",
+            opacity: visibleSections.faq ? 1 : 0,
+            transform: visibleSections.faq ? "translateY(0)" : "translateY(50px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
           <Title level={2} style={{ color: "#1890ff", textAlign: "center", fontWeight: 700, marginBottom: 32 }}>Frequently Asked Questions</Title>
     <Collapse accordion>
       <Panel header="How do I register?" key="1">
