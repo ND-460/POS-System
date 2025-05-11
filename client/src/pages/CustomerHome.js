@@ -260,50 +260,36 @@ const CustomerHome = () => {
         <Divider style={{ margin: '0 auto', maxWidth: 800 }} />
 
         {/* Highlights Section */}
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 16px" }}>
-          <Title level={2} style={{ color: "#1890ff", textAlign: "center", fontWeight: 700, marginBottom: 8 }}>
+        <div id="highlights" style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 16px" }}>
+          <Title level={2} style={{ color: "#1890ff", textAlign: "center", fontWeight: 700, marginBottom: 40 }}>
             Highlights
           </Title>
-          <Text
-            style={{
-              color: "#555",
-              textAlign: "center",
-              display: "block",
-              fontSize: "clamp(12px, 4vw, 16px)", // Automatically adjusts font size
-              marginBottom: 32,
-            }}
-          >
-            Explore why our product stands out: adaptability, durability, user-friendly design, and innovation. Enjoy
-            reliable customer support and precision in every detail.
-          </Text>
-          <Row gutter={[24, 24]} justify="center">
-            {highlights.map((item, idx) => (
-              <Col xs={24} sm={12} md={8} key={item.title}>
-                <Card
-                  bordered={false}
-                  style={{
-                    background: "#f0f2f5", // Match the page theme
-                    color: "#333",
-                    borderRadius: 12,
-                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for consistency
-                    minHeight: 160,
-                  }}
-                  bodyStyle={{ padding: 24 }}
-                >
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 8 }}>
-                    {item.icon}
-                    <div>
-                      <span style={{ fontWeight: 700, color: "#1890ff", fontSize: "clamp(14px, 4vw, 16px)" }}>
-                        {item.title}
-                      </span>
-                    </div>
-                  </div>
-                  <Text style={{ color: "#555", fontSize: "clamp(12px, 4vw, 14px)", lineHeight: 1.6 }}>
-                    {item.description}
-                  </Text>
-                </Card>
-              </Col>
-            ))}
+          <Row gutter={[32, 32]} justify="center" align="middle">
+            {/* Highlight List */}
+            <Col xs={24} md={24}>
+              <Row gutter={[24, 24]}>
+                {highlights.map((highlight) => (
+                  <Col xs={24} sm={12} md={8} key={highlight.title}>
+                    <Card
+                      hoverable
+                      bordered
+                      style={{
+                        borderRadius: 16,
+                        background: "#fff",
+                        borderColor: "#1890ff",
+                        cursor: "pointer",
+                        minHeight: 180,
+                      }}
+                    >
+                      <Title level={4} style={{ color: "#1890ff", marginBottom: 8 }}>
+                        {highlight.icon} {highlight.title}
+                      </Title>
+                      <Text style={{ color: "#555" }}>{highlight.description}</Text>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </Col>
           </Row>
         </div>
 
