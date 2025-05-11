@@ -55,8 +55,13 @@ router.get("/:billId", async (req, res) => {
       return res.status(404).json({ message: "Bill not found" });
     }
 
-    console.log("- Sending Bill Data:", bill);
-    res.json(bill);
+    const response = {
+      ...bill.toObject(),
+      customerName: bill.customer?.name || "Guest", // Ensure customerName is included
+    };
+
+    console.log("- Sending Bill Data:", response);
+    res.json(response);
   } catch (error) {
     console.error("- Error fetching bill:", error);
     res.status(500).json({ message: "Failed to fetch bill" });

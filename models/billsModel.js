@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const billSchema = new mongoose.Schema(
   {
     customer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
+    customerName: { type: String, default: "Guest" }, // Add customerName field
     cashier: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     cashierName: { type: String, required: true }, // Store cashier name
     items: [

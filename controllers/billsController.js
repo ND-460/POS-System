@@ -140,6 +140,7 @@ exports.completeTransaction = async (req, res) => {
       paymentMethod,
       taxAmount,
       loyaltyPointsUsed,
+      customerName: customerData ? customerData.name : "Guest", // Set customerName correctly
     });
     await bill.save();
 

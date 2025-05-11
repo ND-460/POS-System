@@ -27,7 +27,9 @@ const ReceiptPage = () => {
 
         // Ensure customerName is set correctly
         if (!data.customerName && data.customer) {
-          data.customerName = data.customer.name || "Guest";
+          data.customerName = data.customer.name || "Guest"; // Use customer.name if available
+        } else if (!data.customerName) {
+          data.customerName = "Guest"; // Default to "Guest" if no customer data
         }
 
         setBill(data);
