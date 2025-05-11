@@ -44,7 +44,7 @@ const AdminDashboard = () => {
   return (
     <Layout>
       <Sider collapsible breakpoint="md" collapsedWidth="0">
-        <div className="logo">Admin Panel</div>
+        {/* <div className="logo">Admin Panel</div> */}
         <Menu
           theme="dark"
           mode="inline"

@@ -10,6 +10,7 @@ import Barcode from "react-barcode"; // Import react-barcode
 import jsPDF from "jspdf"; // Import jsPDF
 import "jspdf-autotable"; // Import autotable plugin for tables
 import html2pdf from "html2pdf.js"; // Import html2pdf.js
+import html2canvas from "html2canvas"; // Import html2canvas
 
 const { RangePicker } = DatePicker;
 
@@ -267,6 +268,64 @@ const AdminReports = () => {
     html2pdf().set(options).from(element).save();
   };
 
+  const downloadChartsPDF = () => {
+    const element = document.createElement("div");
+    element.innerHTML = `
+      <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-family: Arial, sans-serif; color: #333;">Charts Report</h2>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;"> <!-- Use flex-wrap for layout -->
+      </div>
+    `;
+
+    const charts = [
+      { id: "category-sales-chart", title: "Category Sales Chart" },
+      { id: "most-sold-items-chart", title: "Most Sold Items Chart" },
+      { id: "monthly-revenue-chart", title: "Monthly Revenue Chart", pageBreak: true }, // Add pageBreak flag for the last chart
+    ];
+
+    const flexContainer = element.querySelector("div:last-child"); // Select the flex container for charts
+
+    const promises = charts.map((chart) => {
+      const chartElement = document.getElementById(chart.id);
+      if (chartElement) {
+        return new Promise((resolve) => {
+          setTimeout(() => { // Add a delay of 3000ms
+            html2canvas(chartElement).then((canvas) => {
+              const imgData = canvas.toDataURL("image/png");
+              const chartDiv = document.createElement("div");
+              chartDiv.style.textAlign = "center";
+              chartDiv.style.flex = "1 1 100%"; // Ensure charts fit within one page
+              chartDiv.style.maxWidth = "100%";
+              chartDiv.style.marginBottom = "20px";
+              chartDiv.innerHTML = `
+                <h3 style="font-family: Arial, sans-serif; color: #333; margin-bottom: 10px;">${chart.title}</h3>
+                <img src="${imgData}" style="width: 100%; max-width: 600px;" /> <!-- Increase max-width for larger images -->
+              `;
+              if (chart.pageBreak) {
+                chartDiv.style.pageBreakBefore = "always"; // Add page break for the last chart
+              }
+              flexContainer.appendChild(chartDiv);
+              resolve();
+            });
+          }, 3000); // Delay of 3000ms
+        });
+      }
+      return Promise.resolve();
+    });
+
+    Promise.all(promises).then(() => {
+      const options = {
+        margin: 0.5,
+        filename: "charts-report.pdf",
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      };
+
+      html2pdf().set(options).from(element).save();
+    });
+  };
+
   return (
     <div>
       <h2>Reports</h2>
@@ -295,8 +354,18 @@ const AdminReports = () => {
         >
           Charts
         </Button>
+        {activeReport !== "charts" && (
+        <>
+
         <Button onClick={downloadExcel}>Download Excel</Button>
         <Button onClick={downloadPDF}>Download PDF</Button>
+        </>)}
+        {activeReport === "charts" && (
+          <>
+            <Button onClick={downloadChartsPDF}>Download Charts PDF</Button>
+            
+          </>
+        )}
       </Space>
       {activeReport === "sales" && (
         <>
@@ -359,20 +428,23 @@ const AdminReports = () => {
             display: "flex",
             flexDirection: "column",
             gap: "40px",
+            alignItems: "center", // Center align the entire chart section
           }}
         >
           <div
             style={{
               display: "flex",
               flexWrap: "wrap", // Allow wrapping for responsiveness
-              justifyContent: "space-between",
+              justifyContent: "center", // Center align charts in the row
               gap: "20px",
+              width: "100%", // Ensure full width for proper alignment
             }}
           >
             <div
+              id="category-sales-chart"
               style={{
-                flex: "1 1 100%",
-                maxWidth: "100%",
+                flex: "1 1 45%", // Adjust width for better alignment
+                maxWidth: "45%",
                 height: "400px",
                 minWidth: "300px", // Ensure minimum width for smaller screens
               }}
@@ -380,9 +452,10 @@ const AdminReports = () => {
               <CategorySalesChart />
             </div>
             <div
+              id="most-sold-items-chart"
               style={{
-                flex: "1 1 100%",
-                maxWidth: "100%",
+                flex: "1 1 45%", // Adjust width for better alignment
+                maxWidth: "45%",
                 height: "400px",
                 minWidth: "300px", // Ensure minimum width for smaller screens
               }}
@@ -391,7 +464,9 @@ const AdminReports = () => {
             </div>
           </div>
           <div
+            id="monthly-revenue-chart"
             style={{
+              width: "90%", // Center align and limit width for the larger chart
               height: "400px",
               marginTop: "20px",
               minWidth: "300px", // Ensure minimum width for smaller screens
