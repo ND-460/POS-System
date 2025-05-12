@@ -8,6 +8,8 @@ const client = new OAuth2Client("YOUR_GOOGLE_CLIENT_ID");
 const sendEmail = require("../config/mailer");
 const Event = require("../models/eventModel");
 const bcrypt = require("bcryptjs");
+const Category = require("../models/categoryModel"); // Ensure Category model is imported
+const Item = require("../models/itemModel"); // Ensure Item model is imported
 
 // - Login User
 const loginController = async (req, res) => {
@@ -290,13 +292,24 @@ const createEvent = async (req, res) => {
     // Fetch all customers
     const customers = await User.find({ role: "customer" });
 
+    // Fetch item names from IDs
+    const itemDocs = await Item.find({ _id: { $in: items } }).select("name");
+    const itemNames = itemDocs.map(item => item.name).join(", ");
+
+    // Fetch category names from IDs
+    const categoryDocs = await Category.find({ _id: { $in: categories } }).select("name");
+    const categoryNames = categoryDocs.map(category => category.name).join(", ");
+
+    // Format date into a simpler format (e.g., YYYY-MM-DD)
+    const formattedDate = new Date(date).toISOString().split("T")[0];
+
     // Send emails asynchronously
     (async () => {
       const emailPromises = customers.map((customer) =>
         sendEmail({
           email: customer.email,
           subject: `New Event: ${title}`,
-          message: `Hello ${customer.name},\n\nWe are excited to announce a new event: ${title}.\n\nDetails:\n${description}\n\nDon't miss out on this offer!\n\nBest regards,\nYour Team`,
+          message: `Hello ${customer.name},\n\nWe are excited to announce a new event: ${title} with a discount of ${discount}% on the following items: ${itemNames}.\n\nCategories: ${categoryNames}\n\nEvent Date: ${formattedDate}\n\nDetails:\n${description}\n\nDon't miss out on this offer!\n\nBest regards,\nYour Team`,
         })
       );
       try {
