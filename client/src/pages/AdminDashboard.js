@@ -75,13 +75,24 @@ const AdminDashboard = () => {
           <Menu.Item key="EventsMessage" icon={<MessageOutlined />}>
             Message
           </Menu.Item>
-          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+          <Menu.Item
+            key="logout"
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+          >
             Logout
           </Menu.Item>
         </Menu>
       </Sider>
       <Layout>
-        <Content style={{ margin: "16px", padding: "20px", background: "#fff", minHeight: "80vh" }}>
+        <Content
+          style={{
+            margin: "16px",
+            padding: "20px",
+            background: "#fff",
+            minHeight: "80vh",
+          }}
+        >
           <div style={{ padding: "24px" }}>
             {selectedSection === "items" && <AdminManageItems />}
             {selectedSection === "categories" && <AdminManageCategories />}

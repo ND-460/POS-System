@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Form, Input, Button, DatePicker, message, Card, Typography, Divider } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/CustomerAuth.css"; // Custom styles
 
@@ -132,6 +132,11 @@ const CustomerAuth = () => {
         <Text className="toggle-text" onClick={() => setIsRegister(!isRegister)}>
           {isRegister ? "Already have an account? Login" : "New here? Register now"}
         </Text>
+
+        
+        <Link to="/login" className="redirect-text toggle-text" style={{textDecoration: "none"}}>
+          Not a customer?
+        </Link>
       </Card>
     </div>
   );

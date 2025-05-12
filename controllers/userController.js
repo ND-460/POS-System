@@ -287,6 +287,26 @@ const createEvent = async (req, res) => {
     const newEvent = new Event({ title, description, discount, date, categories, items });
     await newEvent.save();
 
+    // Fetch all customers
+    const customers = await User.find({ role: "customer" });
+
+    // Send emails asynchronously
+    (async () => {
+      const emailPromises = customers.map((customer) =>
+        sendEmail({
+          email: customer.email,
+          subject: `New Event: ${title}`,
+          message: `Hello ${customer.name},\n\nWe are excited to announce a new event: ${title}.\n\nDetails:\n${description}\n\nDon't miss out on this offer!\n\nBest regards,\nYour Team`,
+        })
+      );
+      try {
+        await Promise.all(emailPromises);
+        console.log("Emails sent successfully to all customers.");
+      } catch (error) {
+        console.error("Error sending emails to customers:", error);
+      }
+    })();
+
     res.status(201).json({ message: "Event created successfully!", event: newEvent });
   } catch (error) {
     console.error("- Error creating event:", error);
