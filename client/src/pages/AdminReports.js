@@ -5,15 +5,11 @@ import moment from "moment";
 import CategorySalesChart from "../components/CategorySalesChart"; // Import the pie chart component
 import MostSoldItemsChart from "../components/MostSoldItemsChart"; // Import the bar chart component
 import MonthlyRevenueChart from "../components/MonthlyRevenueChart"; // Import the new chart component
-import { render } from "react-dom";
 import Barcode from "react-barcode"; // Import react-barcode
-import jsPDF from "jspdf"; // Import jsPDF
 import "jspdf-autotable"; // Import autotable plugin for tables
 import html2pdf from "html2pdf.js"; // Import html2pdf.js
 import html2canvas from "html2canvas"; // Import html2canvas
-
 const { RangePicker } = DatePicker;
-
 const AdminReports = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -65,42 +61,6 @@ const AdminReports = () => {
     fetchInventoryReports();
   }, []);
 
-  const columns = [
-    {
-      title: "Date",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (text) => moment(text).format("YYYY-MM-DD"),
-      sorter: true,
-    },
-    {
-      title: "Cashier",
-      dataIndex: "cashierName",
-      key: "cashierName",
-      sorter: true,
-    },
-    {
-      title: "Customer",
-      dataIndex: "customerName",
-      key: "customerName",
-      render: (text) => text || "Guest",
-      sorter: true,
-    },
-    {
-      title: "Total Amount",
-      dataIndex: "totalAmount",
-      key: "totalAmount",
-      render: (amount) => `₹${amount.toFixed(2)}`,
-      sorter: true,
-    },
-    {
-      title: "Payment Method",
-      dataIndex: "paymentMethod",
-      key: "paymentMethod",
-      sorter: true,
-    },
-  ];
-
   const inventoryColumns = [
     {
       title: "Item Name",
@@ -117,7 +77,7 @@ const AdminReports = () => {
       dataIndex: "inventoryUpdated",
       key: "inventoryUpdated",
       render: (text) => {
-        console.log("Rendering Last Updated:", text); 
+        console.log("Rendering Last Updated:", text);
         return text ? moment(text).format("YYYY-MM-DD HH:mm") : "Never";
       },
     },
@@ -126,13 +86,15 @@ const AdminReports = () => {
       dataIndex: "barcode",
       key: "barcode",
       render: (text) => {
-        console.log("Rendering Barcode:", text); 
+        console.log("Rendering Barcode:", text);
         return text ? (
           <div>
             <Barcode value={text} width={1} height={50} fontSize={12} />
             {/* <div style={{ marginTop: "5px", fontSize: "12px", textAlign: "center" }}>{text}</div> */}
           </div>
-        ) : "N/A";
+        ) : (
+          "N/A"
+        );
       },
     },
   ];
@@ -179,7 +141,9 @@ const AdminReports = () => {
     }
 
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = `${activeReport}-report.xlsx`;
@@ -188,7 +152,10 @@ const AdminReports = () => {
 
   const downloadPDF = () => {
     const element = document.createElement("div");
-    const title = activeReport === "sales" ? "Sales Transactions Report" : "Inventory Modification Report";
+    const title =
+      activeReport === "sales"
+        ? "Sales Transactions Report"
+        : "Inventory Modification Report";
 
     // Add a styled title
     element.innerHTML = `
@@ -215,11 +182,21 @@ const AdminReports = () => {
               .map(
                 (report) => `
               <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;">${moment(report.createdAt).format("YYYY-MM-DD")}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${report.cashierName}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${report.customerName || "Guest"}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">₹${report.totalAmount.toFixed(2)}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${report.paymentMethod}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${moment(
+                  report.createdAt
+                ).format("YYYY-MM-DD")}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  report.cashierName
+                }</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  report.customerName || "Guest"
+                }</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">₹${report.totalAmount.toFixed(
+                  2
+                )}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  report.paymentMethod
+                }</td>
               </tr>
             `
               )
@@ -244,10 +221,20 @@ const AdminReports = () => {
               .map(
                 (item) => `
               <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;">${item.name}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${item.stock}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${item.inventoryUpdated ? moment(item.inventoryUpdated).format("YYYY-MM-DD HH:mm") : "Never"}</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">${item.barcode || "N/A"}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  item.name
+                }</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  item.stock
+                }</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  item.inventoryUpdated
+                    ? moment(item.inventoryUpdated).format("YYYY-MM-DD HH:mm")
+                    : "Never"
+                }</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">${
+                  item.barcode || "N/A"
+                }</td>
               </tr>
             `
               )
@@ -281,7 +268,11 @@ const AdminReports = () => {
     const charts = [
       { id: "category-sales-chart", title: "Category Sales Chart" },
       { id: "most-sold-items-chart", title: "Most Sold Items Chart" },
-      { id: "monthly-revenue-chart", title: "Monthly Revenue Chart", pageBreak: true }, // Add pageBreak flag for the last chart
+      {
+        id: "monthly-revenue-chart",
+        title: "Monthly Revenue Chart",
+        pageBreak: true,
+      }, // Add pageBreak flag for the last chart
     ];
 
     const flexContainer = element.querySelector("div:last-child"); // Select the flex container for charts
@@ -290,7 +281,8 @@ const AdminReports = () => {
       const chartElement = document.getElementById(chart.id);
       if (chartElement) {
         return new Promise((resolve) => {
-          setTimeout(() => { // Add a delay of 3000ms
+          setTimeout(() => {
+            // Add a delay of 3000ms
             html2canvas(chartElement).then((canvas) => {
               const imgData = canvas.toDataURL("image/png");
               const chartDiv = document.createElement("div");
@@ -355,15 +347,14 @@ const AdminReports = () => {
           Charts
         </Button>
         {activeReport !== "charts" && (
-        <>
-
-        <Button onClick={downloadExcel}>Download Excel</Button>
-        <Button onClick={downloadPDF}>Download PDF</Button>
-        </>)}
+          <>
+            <Button onClick={downloadExcel}>Download Excel</Button>
+            <Button onClick={downloadPDF}>Download PDF</Button>
+          </>
+        )}
         {activeReport === "charts" && (
           <>
             <Button onClick={downloadChartsPDF}>Download Charts PDF</Button>
-            
           </>
         )}
       </Space>
@@ -392,10 +383,22 @@ const AdminReports = () => {
           <Table
             dataSource={reports}
             columns={[
-              { title: "Date", dataIndex: "createdAt", render: (text) => moment(text).format("YYYY-MM-DD") },
+              {
+                title: "Date",
+                dataIndex: "createdAt",
+                render: (text) => moment(text).format("YYYY-MM-DD"),
+              },
               { title: "Cashier", dataIndex: "cashierName" },
-              { title: "Customer", dataIndex: "customerName", render: (text) => text || "Guest" },
-              { title: "Total Amount", dataIndex: "totalAmount", render: (amount) => `₹${amount.toFixed(2)}` },
+              {
+                title: "Customer",
+                dataIndex: "customerName",
+                render: (text) => text || "Guest",
+              },
+              {
+                title: "Total Amount",
+                dataIndex: "totalAmount",
+                render: (amount) => `₹${amount.toFixed(2)}`,
+              },
               { title: "Payment Method", dataIndex: "paymentMethod" },
             ]}
             rowKey="_id"
@@ -410,7 +413,9 @@ const AdminReports = () => {
         </>
       )}
       {activeReport === "inventory" && (
-        <div style={{ overflowX: "auto" }}> {/* Add horizontal scrolling */}
+        <div style={{ overflowX: "auto" }}>
+          {" "}
+          {/* Add horizontal scrolling */}
           <Table
             dataSource={inventoryReports}
             columns={inventoryColumns}
@@ -479,5 +484,4 @@ const AdminReports = () => {
     </div>
   );
 };
-
 export default AdminReports;
