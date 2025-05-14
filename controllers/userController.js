@@ -8,8 +8,8 @@ const client = new OAuth2Client("YOUR_GOOGLE_CLIENT_ID");
 const sendEmail = require("../config/mailer");
 const Event = require("../models/eventModel");
 const bcrypt = require("bcryptjs");
-const Category = require("../models/categoryModel"); // Ensure Category model is imported
-const Item = require("../models/itemModel"); // Ensure Item model is imported
+const Category = require("../models/categoryModel"); 
+const Item = require("../models/itemModel"); 
 
 // - Login User
 const loginController = async (req, res) => {
@@ -55,7 +55,7 @@ const loginController = async (req, res) => {
 };
 const generateQrLoginUrl = async (req, res) => {
   try {
-    const loginUrl = `http://localhost:3000/customer-login`; // - Change as per frontend
+    const loginUrl = `${process.env.FRONTEND_URL}/customer-login`; 
     res.json({ qrUrl: loginUrl });
   } catch (error) {
     console.error("- Error generating QR Code URL:", error);
@@ -72,25 +72,25 @@ const googleAuthCallback = async (req, res, next) => {
     if (err) {
       console.error("- Google Auth Error:", err);
       return res.redirect(
-        "http://localhost:3000/customer-auth?error=GoogleAuthFailed" // Ensure this matches your frontend route
+        `${process.env.FRONTEND_URL}/customer-auth?error=GoogleAuthFailed` // Ensure this matches your frontend route
       );
     }
     if (!user) {
       console.warn("- Google Auth Failed: No user found");
       return res.redirect(
-        "http://localhost:3000/customer-auth?error=GoogleAuthFailed" // Ensure this matches your frontend route
+        `${process.env.FRONTEND_URL}/customer-auth?error=GoogleAuthFailed` // Ensure this matches your frontend route
       );
     }
     req.login(user, (err) => {
       if (err) {
         console.error("- Error logging in user:", err);
         return res.redirect(
-          "http://localhost:3000/customer-auth?error=GoogleAuthFailed" // Ensure this matches your frontend route
+          `${process.env.FRONTEND_URL}/customer-auth?error=GoogleAuthFailed` // Ensure this matches your frontend route
         );
       }
       console.log("- Redirecting to frontend with user ID:", user._id);
       return res.redirect(
-        `http://localhost:3000/customer-auth?googleSuccess=true&userId=${user._id}` // Ensure this matches your frontend route
+        `${process.env.FRONTEND_URL}/customer-auth?googleSuccess=true&userId=${user._id}` // Ensure this matches your frontend route
       );
     });
   })(req, res, next);
