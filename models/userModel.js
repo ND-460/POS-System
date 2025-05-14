@@ -15,14 +15,14 @@ const userSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false }, // QR verification
     loyaltyPoints: { type: Number, default: 0 },
     pastOrders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Bill" }],
-    specialDiscounts: [{ type: String }], // Example: ["Birthday Discount"]
+    specialDiscounts: [{ type: String }],
   },
   { timestamps: true }
 );
 
 userSchema.statics.getBirthdayCustomers = async function () {
   const today = new Date();
-  const month = today.getMonth() + 1; // Months are 0-indexed
+  const month = today.getMonth() + 1;
   const day = today.getDate();
 
   return this.find({

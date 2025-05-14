@@ -3,21 +3,21 @@ const mongoose = require("mongoose");
 const billSchema = new mongoose.Schema(
   {
     customer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
-    customerName: { type: String, default: "Guest" }, // Add customerName field
+    customerName: { type: String, default: "Guest" },
     cashier: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    cashierName: { type: String, required: true }, // Store cashier name
+    cashierName: { type: String, required: true },
     items: [
       {
         item: { type: mongoose.Schema.Types.ObjectId, ref: "Item", required: true },
-        itemName: { type: String, required: true }, // Store item name
+        itemName: { type: String, required: true },
         quantity: { type: Number, required: true },
         price: { type: Number, required: true },
-        originalPrice: { type: Number, required: true }, // Original price before discounts
-        itemDiscount: { type: Number, default: 0 }, // Item's base discount percentage
-        eventDiscount: { type: Number, default: 0 }, // Event discount percentage
-        itemDiscountAmount: { type: Number, default: 0 }, // Amount saved from item discount
-        eventDiscountAmount: { type: Number, default: 0 }, // Amount saved from event discount
-        subtotal: { type: Number, required: true }, // Final price after all discounts
+        originalPrice: { type: Number, required: true }, 
+        itemDiscount: { type: Number, default: 0 }, 
+        eventDiscount: { type: Number, default: 0 },
+        itemDiscountAmount: { type: Number, default: 0 }, 
+        eventDiscountAmount: { type: Number, default: 0 }, 
+        subtotal: { type: Number, required: true }, 
         loyaltyPoints: { type: Number, default: 0 },
       },
     ],
@@ -25,7 +25,7 @@ const billSchema = new mongoose.Schema(
     taxAmount: { type: Number, default: 0 },
     paymentMethod: { 
       type: String, 
-      enum: ["cash", "cheque", "loyalty points", "UPI"], // Removed "mixed"
+      enum: ["cash", "cheque", "loyalty points", "UPI"], 
       required: true 
     },
     event: {
@@ -33,7 +33,7 @@ const billSchema = new mongoose.Schema(
       title: { type: String },
       discount: { type: Number }
     },
-    loyaltyPointsUsed: { type: Number, default: 0 }, // Track loyalty points used
+    loyaltyPointsUsed: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
