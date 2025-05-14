@@ -11,7 +11,7 @@ const MonthlyRevenueChart = () => {
 
   const fetchMonthlyRevenueData = async () => {
     try {
-      const response = await axios.get("/api/reports/monthly-revenue");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/reports/monthly-revenue`);
       const data = response.data;
 
       const labels = data.map((item) => item.month);

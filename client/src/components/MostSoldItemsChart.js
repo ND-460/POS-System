@@ -11,7 +11,7 @@ const MostSoldItemsChart = () => {
 
   const fetchMostSoldItemsData = async () => {
     try {
-      const response = await axios.get("/api/reports/most-sold-items");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/reports/most-sold-items`);
       const data = response.data;
 
       const labels = data.map((item) => item.itemName);
