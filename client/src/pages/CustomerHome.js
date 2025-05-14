@@ -284,7 +284,7 @@ const CustomerHome = () => {
           <Row gutter={[32, 32]} justify="center" align="middle">
             <Col xs={24} md={12}>
               <Image
-                src="/media/PcMobile.jpeg" // Replace with the actual image path
+                src={`${process.env.REACT_APP_API_URL}/media/PcMobile.jpeg`} 
                 alt="Responsive Design"
                 width="100%"
                 style={{ objectFit: "cover", borderRadius: 16 }}
