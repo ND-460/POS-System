@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Input, InputNumber, Form, DatePicker, Select, message, Row, Col, Modal } from "antd";
 import axios from "axios";
 import moment from "moment";
-
+// require('dotenv').config();
 const { Option } = Select;
 
 const AdminEventAlert = () => {
@@ -22,7 +22,7 @@ const AdminEventAlert = () => {
 
   const loadEvents = async () => {
     try {
-      const { data } = await axios.get("/api/events");
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/events`);
       setEvents(data);
       setLoading(false);
     } catch (error) {
@@ -33,7 +33,7 @@ const AdminEventAlert = () => {
 
   const loadItems = async () => {
     try {
-      const { data } = await axios.get("/api/items");
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/items`);
       setItems(data);
     } catch (error) {
       console.error("Error fetching items:", error);
@@ -43,7 +43,7 @@ const AdminEventAlert = () => {
 
   const loadCategories = async () => {
     try {
-      const { data } = await axios.get("/api/categories");
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/categories`);
       setCategories(data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -64,7 +64,7 @@ const AdminEventAlert = () => {
       }
 
       if (editingEvent) {
-        await axios.put(`/api/events/${editingEvent}`, payload);
+        await axios.put(`${process.env.REACT_APP_API_URL}/api/events/${editingEvent}`, payload);
         message.success("Event updated successfully!");
         setEvents((prevEvents) =>
           prevEvents.map((event) =>
@@ -73,7 +73,7 @@ const AdminEventAlert = () => {
         );
         setEditingEvent(null);
       } else {
-        const { data } = await axios.post("/api/events", payload);
+        const { data } = await axios.post(`${process.env.REACT_APP_API_URL}/api/events`, payload);
         message.success("Event created successfully!");
         setEvents((prevEvents) => [...prevEvents, data.event]);
       }
@@ -87,7 +87,7 @@ const AdminEventAlert = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/events/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/events/${id}`);
       message.success("Event deleted successfully!");
       setEvents((prevEvents) => prevEvents.filter((event) => event._id !== id));
     } catch (error) {

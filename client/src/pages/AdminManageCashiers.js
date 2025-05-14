@@ -22,7 +22,7 @@ const AdminManageCashiers = () => {
   // -Fetch Cashiers
   const loadCashiers = async () => {
     try {
-      const { data } = await axios.get("api/users/cashiers");
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/cashiers`);
       console.log("- Cashiers Loaded:", data); // Log fetched data
       setCashiers(data);
     } catch (error) {
@@ -60,7 +60,7 @@ const AdminManageCashiers = () => {
   const handleSave = async (values) => {
     try {
       if (editingCashier) {
-        await axios.put(`api/users/cashiers/${editingCashier}`, values);
+        await axios.put(`${process.env.REACT_APP_API_URL}/api/users/cashiers/${editingCashier}`, values);
         message.success("Cashier updated successfully!");
         setCashiers((prevCashiers) =>
           prevCashiers.map((cashier) =>
@@ -68,7 +68,7 @@ const AdminManageCashiers = () => {
           )
         );
       } else {
-        const { data } = await axios.post("api/users/register", {
+        const { data } = await axios.post(`${process.env.REACT_APP_API_URL}/api/users/register`, {
           ...values,
           role: "cashier", // Ensure role is set to cashier
         });
@@ -88,7 +88,7 @@ const AdminManageCashiers = () => {
   const handleDelete = async (cashierId) => {
     try {
       console.log(` Deleting Cashier ID: ${cashierId}`);
-      await axios.delete(`api/users/cashiers/${cashierId}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/users/cashiers/${cashierId}`);
       message.success("Cashier deleted successfully!");
   
       //  Remove cashier from UI after deletion
@@ -128,7 +128,7 @@ const AdminManageCashiers = () => {
 
   const saveInlineEdit = async (id) => {
     try {
-      await axios.put(`api/users/cashiers/${id}`, updatedCashier);
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/users/cashiers/${id}`, updatedCashier);
       message.success("Cashier updated successfully!");
       setEditingCashierId(null);
       loadCashiers();

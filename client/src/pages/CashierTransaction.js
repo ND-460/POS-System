@@ -47,7 +47,7 @@ const CashierTransaction = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const { data } = await axios.get("api/users/customers");
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/customers`);
         setCustomersList(data);
       } catch (error) {
         console.error("Error fetching customers:", error);
@@ -64,7 +64,7 @@ const CashierTransaction = () => {
   useEffect(() => {
     const fetchActiveEvent = async () => {
       try {
-        const { data } = await axios.get("api/events");
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/events`);
         const today = moment();
         const active = data.find((event) => moment(event.date).isSame(today, "day"));
         if (active) {
@@ -84,7 +84,7 @@ const CashierTransaction = () => {
 
   const scanBarcode = async () => {
     try {
-      const { data } = await axios.get(`api/items/barcode/${barcode}`);
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/items/barcode/${barcode}`);
       const existingItem = cart.find((item) => item._id === data._id);
       if (existingItem) {
         existingItem.quantity += 1;
@@ -157,7 +157,7 @@ const CashierTransaction = () => {
         taxAmount: calculateTotalWithDiscount() * 0.1, // Example tax calculation
       };
 
-      const response = await axios.post("api/bills/complete", transaction);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/bills/complete`, transaction);
 
       if (response.status === 201) {
         message.success("Transaction completed!");

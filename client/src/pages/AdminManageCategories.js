@@ -19,7 +19,7 @@ const AdminManageCategories = () => {
   // Load categories
   const loadCategories = async () => {
     try {
-      const { data } = await axios.get("api/categories");
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/categories`);
       setCategories(data);
     } catch (error) {
       message.error("Failed to load categories");
@@ -33,7 +33,7 @@ const AdminManageCategories = () => {
       return;
     }
     try {
-      await axios.post("api/categories/add", 
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/categories/add`, 
         { name: newCategory.trim() }, // -Ensure correct body format
         { headers: { "Content-Type": "application/json" } } // -Ensure JSON content type
       );
@@ -53,7 +53,7 @@ const AdminManageCategories = () => {
       return;
     }
     try {
-      await axios.put(`api/categories/${id}`, { name: updatedName.trim() });
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/categories/${id}`, { name: updatedName.trim() });
       message.success("Category updated successfully!");
       setEditingCategory(null);
       loadCategories();
@@ -65,7 +65,7 @@ const AdminManageCategories = () => {
   // Delete category
   const deleteCategory = async (id) => {
     try {
-      await axios.delete(`api/categories/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/categories/${id}`);
       message.success("Category deleted successfully!");
       loadCategories();
     } catch (error) {

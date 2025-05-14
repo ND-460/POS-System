@@ -24,7 +24,7 @@ const AdminManageItems = () => {
   // Load items from backend
   const loadItems = async () => {
     try {
-      const { data } = await axios.get("api/items");
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/items`);
       setItems(data);
     } catch (error) {
       message.error("Failed to load items");
@@ -33,7 +33,7 @@ const AdminManageItems = () => {
 
   const loadCategories = async () => {
     try {
-      const { data } = await axios.get("api/categories");
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/categories`);
       console.log("Categories Fetched:", data); // -Debugging Log
       setCategories(data);
     } catch (error) {
@@ -48,7 +48,7 @@ const AdminManageItems = () => {
       console.log("Form Values:", values); // -Debugging Log
       if (editingItem) {
         console.log(`Updating Item ID: ${editingItem}`);
-        await axios.put(`api/items/${editingItem}`, values);
+        await axios.put(`${process.env.REACT_APP_API_URL}/api/items/${editingItem}`, values);
         message.success("Item updated successfully!");
 
         // Update the item in the state
@@ -61,7 +61,7 @@ const AdminManageItems = () => {
         setEditingItem(null);
       } else {
         console.log("Adding New Item");
-        await axios.post("api/items/add", values);
+        await axios.post(`${process.env.REACT_APP_API_URL}/api/items/add`, values);
         message.success("Item added successfully!");
       }
 
@@ -78,7 +78,7 @@ const AdminManageItems = () => {
   const handleDelete = async (id) => {
     try {
       console.log(` Deleting Item ID: ${id}`);
-      await axios.delete(`api/items/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/items/${id}`);
       message.success("Item deleted successfully!");
   
       //  Remove the item from state after deletion

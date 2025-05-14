@@ -20,7 +20,7 @@ const ReceiptPage = () => {
 
       try {
         console.log(`- Fetching bill with ID: ${billId}`);
-        const { data } = await axios.get(`/api/bills/${billId}`);
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/bills/${billId}`);
         if (!data || !data.items || data.items.length === 0) {
           throw new Error("Incomplete bill data");
         }

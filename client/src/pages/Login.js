@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { message, Form, Input, Button, Card, Typography } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 import "../styles/Login.css"; // -Import custom styles
 
 const { Title } = Typography;
@@ -16,7 +17,7 @@ const Login = () => {
   const handleLogin = async (values) => {
     setLoading(true);
     try {
-      const { data } = await axios.post("api/users/login", values);
+      const { data } = await axios.post(`${process.env.REACT_APP_API_URL}/api/users/login`, values);
       dispatch({ type: "LOGIN_SUCCESS", payload: data });
       message.success("Login successful!");
 
@@ -49,6 +50,9 @@ const Login = () => {
             Login
           </Button>
         </Form>
+        <Link to="/" className="redirect-text toggle-text" style={{ textDecoration: "none" }}>
+                    Back to home
+        </Link>
       </Card>
     </div>
   );

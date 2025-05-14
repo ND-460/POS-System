@@ -20,7 +20,7 @@ const AdminReports = () => {
   const fetchReports = async (pagination, filters, sorter = {}) => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/reports", {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/reports`, {
         params: {
           startDate: dateRange[0] ? dateRange[0].toISOString() : null,
           endDate: dateRange[1] ? dateRange[1].toISOString() : null,
@@ -39,7 +39,7 @@ const AdminReports = () => {
   const fetchInventoryReports = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/reports/inventory");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/reports/inventory`);
       const formattedData = response.data.map((item) => ({
         ...item,
         barcode: item.barcode || null, // Ensure barcode is included, set to null if missing

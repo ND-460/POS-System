@@ -18,9 +18,9 @@ const CustomerDashboard = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  // const { user } = useSelector((state) => state.auth);
 
-  const customerId = JSON.parse(localStorage.getItem("auth"))?.user?._id; // Get logged-in user ID
+  // const customerId = JSON.parse(localStorage.getItem("auth"))?.user?._id; // Get logged-in user ID
 
   useEffect(() => {
     fetchOrders();
@@ -42,7 +42,7 @@ const CustomerDashboard = () => {
       console.log(`- Fetching orders for Customer ID: ${customerId}`); // - Debugging
 
       const { data } = await axios.get(
-        `api/users/${customerId}/orders`
+        `${process.env.REACT_APP_API_URL}/api/users/${customerId}/orders`
       );
       setOrders(data);
     } catch (error) {
@@ -64,7 +64,7 @@ const CustomerDashboard = () => {
       console.log(`- Fetching loyalty points for: ${user._id}`);
 
       const { data } = await axios.get(
-        `api/users/${user._id}/loyalty-points`
+        `${process.env.REACT_APP_API_URL}/api/users/${user._id}/loyalty-points`
       );
 
       setLoyaltyPoints(data.loyaltyPoints);

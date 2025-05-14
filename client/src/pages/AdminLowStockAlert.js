@@ -9,7 +9,7 @@ const AdminLowStockAlert = () => {
   useEffect(() => {
     const fetchLowStockItems = async () => {
       try {
-        const response = await axios.get("/api/items/low-stock");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/items/low-stock`);
         setLowStockItems(response.data);
       } catch (error) {
         console.error("Error fetching low stock items:", error);
@@ -21,28 +21,7 @@ const AdminLowStockAlert = () => {
     fetchLowStockItems();
   }, []);
 
-  const columns = [
-    {
-      title: "Item Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-    },
-    {
-      title: "Stock",
-      dataIndex: "stock",
-      key: "stock",
-    },
-    {
-      title: "Low Stock Alert Threshold",
-      dataIndex: "lowStockAlert",
-      key: "lowStockAlert",
-    },
-  ];
+  
 
   return (
     <div>

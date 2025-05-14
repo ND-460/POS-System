@@ -28,7 +28,7 @@ const CustomerAuth = () => {
     if (params.get("googleSuccess") === "true") {
       console.log("- Google Login Success! Fetching User Data...");
   
-      axios.get(`/api/users/${params.get("userId")}`)
+      axios.get(`${process.env.REACT_APP_API_URL}/api/users/${params.get("userId")}`)
         .then((response) => {
           const user = response.data;
           console.log("- Google Auth User:", user);
@@ -63,7 +63,7 @@ const CustomerAuth = () => {
       values.role = "customer"; 
       console.log("- Sending Data:", values);
 
-      const endpoint = isRegister ? "/api/users/register" : "/api/users/login";
+      const endpoint = isRegister ? `${process.env.REACT_APP_API_URL}/api/users/register` : `${process.env.REACT_APP_API_URL}/api/users/login`;
       const { data } = await axios.post(endpoint, values);
 
       message.success(`${isRegister ? "Registration" : "Login"} successful!`);
@@ -82,7 +82,7 @@ const CustomerAuth = () => {
 
   // Handle Google Sign-In
   const handleGoogleLogin = () => {
-    const googleLoginUrl = "http://localhost:8080/api/users/auth/google"; // Ensure this matches your backend route
+    const googleLoginUrl = `${process.env.REACT_APP_API_URL}/api/users/auth/google`; // Ensure this matches your backend route
     console.log("- Redirecting to Google Login:", googleLoginUrl);
     window.location.href = googleLoginUrl;
   };
@@ -133,10 +133,14 @@ const CustomerAuth = () => {
           {isRegister ? "Already have an account? Login" : "New here? Register now"}
         </Text>
 
-        
-        <Link to="/login" className="redirect-text toggle-text" style={{textDecoration: "none"}}>
-          Not a customer?
-        </Link>
+        <div style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}>
+          <Link to="/login" className="redirect-text toggle-text" style={{ textDecoration: "none" }}>
+            Not a customer?
+          </Link>
+          <Link to="/" className="redirect-text toggle-text" style={{ textDecoration: "none" }}>
+            Back to home
+          </Link>
+        </div>
       </Card>
     </div>
   );
